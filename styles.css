@@ -1,0 +1,11 @@
+.block_ranking .header .title h2:before {
+    background-color: #F3F31C;
+	content:"\f091";
+}
+.block_ranking .content .userpicture {
+	width: 24px !important;
+	height: 24px !important;
+	-webkit-border-radius: 16px;
+	-moz-border-radius: 16px;
+	border-radius: 16px;
+}
