@@ -24,10 +24,12 @@ class block_ranking extends block_base {
         return $this->content;
 	}
 	public function cron() {
-        mtrace( "Hey, my cron script is running - block ranking" );
-     
-        // do something
-     
+
+	    block_ranking_calculate_points();
+
         return true;
+    }
+    function has_config() {
+    	return true;
     }
 }
