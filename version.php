@@ -1,6 +1,6 @@
 <?php
 
-$plugin->version  = 2014021900;
+$plugin->version  = 2014022000;
 $plugin->requires = 2013111801;
 $plugin->maturity = 200;
 $plugin->release  = 'Version for Moodle 2.6 onwards';
