@@ -1,10 +1,11 @@
 <?php
 
 function block_ranking_get_students() {
-	global $COURSE, $DB, $PAGE;
+	global $COURSE, $DB, $PAGE, $CFG;
 
 	$context = $PAGE->context;
 
+	$limit = is_null($CFG->block_ranking_rankingsize) ? (int) $CFG->block_ranking_rankingsize : 10;
 	$userfields = user_picture::fields('u', array('username'));
 	$sql = "SELECT DISTINCT $userfields, concat(u.firstname, ' ',u.lastname) as fullname, r.points
             FROM mdl_user u
@@ -15,7 +16,8 @@ function block_ranking_get_students() {
             AND a.userid = u.id
             AND a.roleid = :roleid
             AND c.instanceid = :courseid
-            LIMIT 10";
+            ORDER BY r.points DESC
+            LIMIT " . $limit;
 	$params['contextid'] = $context->id;
 	$params['roleid'] = 5;
 	$params['courseid'] = $COURSE->id;
@@ -76,27 +78,18 @@ function block_ranking_calculate_points() {
 		$lastid = end($completedModules);
 		//last id inserted
 		$lastid = $lastid->id;
-		if($lastid) {
-			//update the lastid on ranking configuration
-			update_ranking_lastid($lastid);
-		}
 
 		foreach ($completedModules as $key => $userCompletion) {
 			add_point_to_user($userCompletion);
 		}
+
+		//update the lastid on ranking configuration
+		update_ranking_lastid($lastid);
+
+		mtrace('... points computeds :P');
+	} else {
+		mtrace('... No new points to be computed');
 	}
-	mtrace('... No new points to be computed');
-}
-
-function update_ranking_lastid($lastid) {
-	global $DB;
-
-	$sql = "SELECT id, name, value FROM {ranking} WHERE name = 'lastid'";
-
-	$ranking = current($DB->get_records_sql($sql));
-	$ranking->value = $lastid;
-
-	$DB->update_record('ranking', $ranking);
 }
 
 function get_modules_completion() {
@@ -105,7 +98,7 @@ function get_modules_completion() {
 	$sql = "SELECT
 				cmc.*,
 				cm.course,
-				cm.module,
+				cm.module as moduleid,
 				cm.instance,
 				cm.score,
 				cm.indent,
@@ -136,8 +129,7 @@ function add_point_to_user($userCompletion) {
 
 	switch ($userCompletion->modulename) {
 		case 'assign':
-				$rankingid = add_or_update_user_points($userCompletion->userid, $userCompletion->course, $CFG->block_ranking_assignpoints);
-				add_ranking_log($rankingid, $userCompletion->course, $userCompletion->id, $CFG->block_ranking_assignpoints);
+			add_assign_points($userCompletion);
 		break;
 
 		case 'resource':
@@ -210,4 +202,76 @@ function add_ranking_log($rankingid, $courseid, $cmc, $points) {
 	$logid = $DB->insert_record('ranking_logs', $rankingLog, true);
 
 	return $logid;
+}
+
+function update_ranking_lastid($lastid) {
+	global $DB;
+
+	$sql = "SELECT id, name, value FROM {ranking} WHERE name = 'lastid'";
+
+	$ranking = current($DB->get_records_sql($sql));
+	$ranking->value = $lastid;
+
+	$DB->update_record('ranking', $ranking);
+}
+
+//Custom methods to add points to users depending of the activity
+function add_assign_points($userCompletion) {
+	global $CFG;
+
+	//default activity points
+	$points = $CFG->block_ranking_assignpoints;
+
+	if(!is_null($userCompletion->completiongradeitemnumber)) {
+		$activityGrade = get_activity_finalgrade($userCompletion->modulename, $userCompletion->instance, $userCompletion->userid);
+		$points += $activityGrade;
+	}
+
+	$rankingid = add_or_update_user_points($userCompletion->userid, $userCompletion->course, $points);
+	add_ranking_log($rankingid, $userCompletion->course, $userCompletion->id, $points);
+}
+function get_activity_finalgrade($activity, $activityid, $userid) {
+	global $DB;
+	$sql = "SELECT
+				gg.itemid, gg.userid, gg.rawscaleid, gg.finalgrade, gi.scaleid
+				FROM mdl_grade_grades gg
+			INNER JOIN mdl_grade_items gi ON gi.id = gg.itemid
+			WHERE gi.itemmodule = :activity AND gi.iteminstance = :iteminstance AND gg.userid = :userid";
+	$params['activity'] = $activity;
+	$params['iteminstance'] = $activityid;
+	$params['userid'] = $userid;
+
+	$gradeItem = $DB->get_records_sql($sql, $params);
+
+	$finalgrade = 0;
+	if( !empty($gradeItem)) {
+		$gradeItem = current($gradeItem);
+
+		//grade without scale -- grademax 100
+		if( empty($gradeItem->scaleid)) {
+			$finalgrade = $gradeItem->finalgrade / 10;
+		} else {
+			$finalgrade = get_finalgrade_by_scale($gradeItem->finalgrade, $gradeItem->scaleid);
+		}
+	}
+
+	return $finalgrade;
+}
+function get_finalgrade_by_scale($finalgrade, $scaleid) {
+	global $DB;
+
+	$sql = "SELECT scale FROM mdl_scale WHERE id = :scaleid";
+	$params['scaleid'] = $scaleid;
+
+	$scale = $DB->get_records_sql($sql, $params);
+
+	if(!empty($scale)) {
+		$scale = current($scale);
+		$scale = explode(',', $scale->scale);
+
+		//fix zero based problem
+		$finalgrade = $scale[$finalgrade - 1];
+	}
+
+	return $finalgrade;
 }

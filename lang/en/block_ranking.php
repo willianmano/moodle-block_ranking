@@ -11,6 +11,10 @@ $string['table_name'] = 'Fullname';
 $string['table_points'] = 'Points';
 
 //global configuration
+$string['rankingsize'] = 'Size of the ranking';
+$string['rankingsize_help'] = 'Number of students that will appear in ranking';
+
+//activites points
 $string['resourcepoints'] = 'Points to resource';
 $string['assignpoints'] = 'Points to assign';
 $string['forumpoints'] = 'Points to forum';

@@ -7,6 +7,9 @@ if ($ADMIN->fulltree) {
     require_once("$CFG->dirroot/blocks/ranking/lib.php");
 
     //--- general settings ---------------------------------------------------------------------------
+    $settings->add(new admin_setting_configtext('block_ranking_rankingsize', get_string('rankingsize', 'block_ranking'),
+        get_string('rankingsize_help', 'block_ranking'), 10, PARAM_INT));
+
     $settings->add(new admin_setting_configtext('block_ranking_resourcepoints', get_string('resourcepoints', 'block_ranking'),
         '', 2, PARAM_INT));
 
