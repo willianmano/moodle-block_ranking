@@ -27,7 +27,8 @@ function block_ranking_get_students() {
 	return $users;
 }
 function block_ranking_print_students($students) {
-	global $OUTPUT;
+	global $OUTPUT, $USER;
+
 	$tableoptions = array('class' => 'rankingTable table table-striped',
                           'cellpadding' => '0',
                           'cellspacing' => '0');
@@ -49,8 +50,14 @@ function block_ranking_print_students($students) {
 	  $content .= HTML_WRITER::end_tag('thead');
 
 	  $content .= HTML_WRITER::start_tag('tbody');
-		for ($i=0; $i < sizeof($students); $i++) { 
-			$content .= HTML_WRITER::start_tag('tr');
+		for ($i=0; $i < sizeof($students); $i++) {
+			//verify if the logged user is one user in ranking
+			$class = '';
+			if($students[$i]->id == $USER->id) {
+				$class = 'itsme';
+			}
+
+			$content .= HTML_WRITER::start_tag('tr', array('class'=> $class));
 		    $content .= HTML_WRITER::start_tag('td');
 		      $content .= ($i+1);
 		    $content .= HTML_WRITER::end_tag('td');
@@ -153,8 +160,7 @@ function add_point_to_user($userCompletion) {
 		break;
 
 		default:
-				$rankingid = add_or_update_user_points($userCompletion->userid, $userCompletion->course, $CFG->block_ranking_defaultpoints);
-				add_ranking_log($rankingid, $userCompletion->course, $userCompletion->id, $CFG->block_ranking_defaultpoints);
+				add_default_points($userCompletion);
 		break;
 	}
 }
@@ -221,6 +227,20 @@ function add_assign_points($userCompletion) {
 
 	//default activity points
 	$points = $CFG->block_ranking_assignpoints;
+
+	if(!is_null($userCompletion->completiongradeitemnumber)) {
+		$activityGrade = get_activity_finalgrade($userCompletion->modulename, $userCompletion->instance, $userCompletion->userid);
+		$points += $activityGrade;
+	}
+
+	$rankingid = add_or_update_user_points($userCompletion->userid, $userCompletion->course, $points);
+	add_ranking_log($rankingid, $userCompletion->course, $userCompletion->id, $points);
+}
+function add_default_points($userCompletion) {
+	global $CFG;
+
+	//default activity points
+	$points = $CFG->block_ranking_defaultpoints;
 
 	if(!is_null($userCompletion->completiongradeitemnumber)) {
 		$activityGrade = get_activity_finalgrade($userCompletion->modulename, $userCompletion->instance, $userCompletion->userid);
