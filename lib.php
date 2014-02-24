@@ -1,11 +1,45 @@
 <?php
+// This file is part of Ranking block for Moodle - http://moodle.org/
+//
+// Moodle is free software: you can redistribute it and/or modify
+// it under the terms of the GNU General Public License as published by
+// the Free Software Foundation, either version 3 of the License, or
+// (at your option) any later version.
+//
+// Moodle is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+// GNU General Public License for more details.
+//
+// You should have received a copy of the GNU General Public License
+// along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
-function block_ranking_get_students() {
+
+/**
+ * Ranking block definition
+ *
+ * @package    contrib
+ * @subpackage block_ranking
+ * @copyright  2014 Willian Mano
+ * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ */
+
+define ('DEFAULT_POINTS', 2);
+
+function block_ranking_get_students($limit = null) {
 	global $COURSE, $DB, $PAGE, $CFG;
+
+	//gest limit from default configuration or instance configuration
+	if (!isset($limit) || !empty(trim($limit))) {
+		if (isset($CFG->block_ranking_rankingsize) && !empty(trim($CFG->block_ranking_rankingsize))) {
+			$limit = $CFG->block_ranking_rankingsize;
+		} else {
+			$limit = 10;
+		}
+	}
 
 	$context = $PAGE->context;
 
-	$limit = is_null($CFG->block_ranking_rankingsize) ? (int) $CFG->block_ranking_rankingsize : 10;
 	$userfields = user_picture::fields('u', array('username'));
 	$sql = "SELECT DISTINCT $userfields, concat(u.firstname, ' ',u.lastname) as fullname, r.points
             FROM mdl_user u
@@ -74,31 +108,54 @@ function block_ranking_print_students($students) {
 
 	return $content;
 }
-
+// // // // // // 
 // CRON FUNCTIONS
+// // // // // // 
+function block_ranking_mirror_completions() {
+	global $DB;
+
+	$completedModules = get_modules_completion_to_mirror();
+
+	if(!empty($completedModules)) {
+		$lastid = end($completedModules);
+		//last id inserted
+		$lastid = $lastid->cmcid;
+	
+		foreach ($completedModules as $key => $module) {
+			$DB->insert_record('ranking_cmc_mirror', $module);
+		}
+	}
+}
+function get_modules_completion_to_mirror() {
+	global $DB;
+
+	$sql = "SELECT
+				cmc.id as cmcid, cmc.coursemoduleid, cmc.userid, cmc.timemodified as timecreated, cmc.timemodified
+			FROM
+				{course_modules_completion} cmc
+			WHERE
+				cmc.id > (SELECT IFNULL(MAX(id),0) FROM {ranking_cmc_mirror})
+			ORDER BY cmc.id";
+
+	$completedModules = array_values($DB->get_records_sql($sql));
+
+	return $completedModules;
+}
 function block_ranking_calculate_points() {
 	global $DB;
 
 	$completedModules = get_modules_completion();
 
 	if(!empty($completedModules)) {
-		$lastid = end($completedModules);
-		//last id inserted
-		$lastid = $lastid->id;
 
 		foreach ($completedModules as $key => $userCompletion) {
 			add_point_to_user($userCompletion);
 		}
-
-		//update the lastid on ranking configuration
-		update_ranking_lastid($lastid);
-
 		mtrace('... points computeds :P');
 	} else {
 		mtrace('... No new points to be computed');
 	}
 }
-
 function get_modules_completion() {
 	global $DB;
 
@@ -115,15 +172,18 @@ function get_modules_completion() {
 				cm.completionexpected,
 				ccc.module,
 				ccc.moduleinstance,
-				m.name as modulename
-			FROM {course_modules_completion} cmc
+				m.name as modulename,
+				cmcm.id as cmcmid
+			FROM
+				{course_modules_completion} cmc
 			INNER JOIN {course_modules} cm ON cm.id = cmc.coursemoduleid
 			INNER JOIN {modules} m ON m.id = cm.module
 			INNER JOIN {course_completion_criteria} ccc ON
 				(ccc.course = cm.course AND ccc.module = m.name AND cm.id = ccc.moduleinstance)
+			INNER JOIN {ranking_cmc_mirror} cmcm ON cmcm.cmcid = cmc.id
 			WHERE
-				cmc.id > (SELECT value FROM {ranking} WHERE name = 'lastid')
-				AND cmc.completionstate = 1
+				cmc.completionstate = 1
+				AND cmcm.computed = 0
 			ORDER BY cmc.id";
 
 	$completedModules = array_values($DB->get_records_sql($sql));
@@ -136,35 +196,45 @@ function add_point_to_user($userCompletion) {
 
 	switch ($userCompletion->modulename) {
 		case 'assign':
-			add_assign_points($userCompletion);
+			add_default_points($userCompletion, $CFG->block_ranking_assignpoints);
 		break;
 
 		case 'resource':
-				$rankingid = add_or_update_user_points($userCompletion->userid, $userCompletion->course, $CFG->block_ranking_resourcepoints);
-				add_ranking_log($rankingid, $userCompletion->course, $userCompletion->id, $CFG->block_ranking_resourcepoints);
+			add_default_points($userCompletion, $CFG->block_ranking_resourcepoints);
 		break;
 
 		case 'forum':
-				$rankingid = add_or_update_user_points($userCompletion->userid, $userCompletion->course, $CFG->block_ranking_forumpoints);
-				add_ranking_log($rankingid, $userCompletion->course, $userCompletion->id, $CFG->block_ranking_forumpoints);
+			add_default_points($userCompletion, $CFG->block_ranking_forumpoints);
 		break;
 
 		case 'workshop':
-				$rankingid = add_or_update_user_points($userCompletion->userid, $userCompletion->course, $CFG->block_ranking_workshoppoints);
-				add_ranking_log($rankingid, $userCompletion->course, $userCompletion->id, $CFG->block_ranking_workshoppoints);
+			add_default_points($userCompletion, $CFG->block_ranking_workshoppoints);
 		break;
 
 		case 'page':
-				$rankingid = add_or_update_user_points($userCompletion->userid, $userCompletion->course, $CFG->block_ranking_pagepoints);
-				add_ranking_log($rankingid, $userCompletion->course, $userCompletion->id, $CFG->block_ranking_pagepoints);
+			add_default_points($userCompletion, $CFG->block_ranking_pagepoints);
 		break;
 
 		default:
-				add_default_points($userCompletion);
+			add_default_points($userCompletion, $CFG->block_ranking_defaultpoints);
 		break;
 	}
 }
 
+//Custom methods to add points to users depending of the activity
+function add_default_points($userCompletion, $points) {
+	if (!isset($points) || !empty(trim($points))) {
+		$points = DEFAULT_POINTS;
+	}
+	if(!is_null($userCompletion->completiongradeitemnumber)) {
+		$activityGrade = get_activity_finalgrade($userCompletion->modulename, $userCompletion->instance, $userCompletion->userid);
+		$points += $activityGrade;
+	}
+
+	$rankingid = add_or_update_user_points($userCompletion->userid, $userCompletion->course, $points);
+	add_ranking_log($rankingid, $userCompletion->course, $userCompletion->id, $points);
+	update_cmcm_completed($userCompletion->cmcmid);
+}
 function add_or_update_user_points($userid, $courseid, $points) {
 	global $DB;
 
@@ -194,7 +264,6 @@ function add_or_update_user_points($userid, $courseid, $points) {
 	}
 	return $rankingid;
 }
-
 function add_ranking_log($rankingid, $courseid, $cmc, $points) {
 	global $DB;
 
@@ -209,47 +278,17 @@ function add_ranking_log($rankingid, $courseid, $cmc, $points) {
 
 	return $logid;
 }
-
-function update_ranking_lastid($lastid) {
+function update_cmcm_completed($cmcid) {
 	global $DB;
 
-	$sql = "SELECT id, name, value FROM {ranking} WHERE name = 'lastid'";
+	$data = new stdClass();
+	$data->id = $cmcid;
+	$data->computed = 1;
+	$data->updated = time();
 
-	$ranking = current($DB->get_records_sql($sql));
-	$ranking->value = $lastid;
-
-	$DB->update_record('ranking', $ranking);
+	$DB->update_record('ranking_cmc_mirror', $data);
 }
-
-//Custom methods to add points to users depending of the activity
-function add_assign_points($userCompletion) {
-	global $CFG;
-
-	//default activity points
-	$points = $CFG->block_ranking_assignpoints;
-
-	if(!is_null($userCompletion->completiongradeitemnumber)) {
-		$activityGrade = get_activity_finalgrade($userCompletion->modulename, $userCompletion->instance, $userCompletion->userid);
-		$points += $activityGrade;
-	}
-
-	$rankingid = add_or_update_user_points($userCompletion->userid, $userCompletion->course, $points);
-	add_ranking_log($rankingid, $userCompletion->course, $userCompletion->id, $points);
-}
-function add_default_points($userCompletion) {
-	global $CFG;
-
-	//default activity points
-	$points = $CFG->block_ranking_defaultpoints;
-
-	if(!is_null($userCompletion->completiongradeitemnumber)) {
-		$activityGrade = get_activity_finalgrade($userCompletion->modulename, $userCompletion->instance, $userCompletion->userid);
-		$points += $activityGrade;
-	}
-
-	$rankingid = add_or_update_user_points($userCompletion->userid, $userCompletion->course, $points);
-	add_ranking_log($rankingid, $userCompletion->course, $userCompletion->id, $points);
-}
+// GET GRADES
 function get_activity_finalgrade($activity, $activityid, $userid) {
 	global $DB;
 	$sql = "SELECT
