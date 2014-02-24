@@ -24,9 +24,9 @@
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
-$plugin->version  = 2014022000;
+$plugin->version  = 2014022400;
 $plugin->requires = 2011120511;
 $plugin->maturity = 200;
-$plugin->release  = 'Version for Moodle 2.6 onwards';
+$plugin->release  = 'Version for Moodle 2.2 onwards';
 $plugin->component = 'block_ranking';
 $plugin->cron      = 300;

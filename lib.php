@@ -134,7 +134,7 @@ function get_modules_completion_to_mirror() {
 			FROM
 				{course_modules_completion} cmc
 			WHERE
-				cmc.id > (SELECT IFNULL(MAX(id),0) FROM {ranking_cmc_mirror})
+				cmc.id > (SELECT IFNULL(MAX(cmcid),0) FROM {ranking_cmc_mirror})
 			ORDER BY cmc.id";
 
 	$completedModules = array_values($DB->get_records_sql($sql));
