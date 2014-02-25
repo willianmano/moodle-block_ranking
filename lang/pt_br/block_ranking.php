@@ -35,12 +35,12 @@ $string['table_position'] = 'Pos';
 $string['table_name'] = 'Nome';
 $string['table_points'] = 'Pontos';
 
-//global configuration
+// Global configuration.
 $string['rankingsize'] = 'Tamanho do ranking';
 $string['rankingsize_help'] = 'Número de estudantes que irão aparecer no ranking';
 $string['configuration'] = 'Configuração do bloco Ranking';
 
-//activites points
+// Activites points.
 $string['resourcepoints'] = 'Pontos para recurso/arquivo';
 $string['assignpoints'] = 'Pontos para tarefa';
 $string['forumpoints'] = 'Pontos para fórum';

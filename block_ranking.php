@@ -28,10 +28,17 @@ require_once(dirname(__FILE__) . '/../../config.php');
 require_once($CFG->dirroot.'/blocks/ranking/lib.php');
 
 class block_ranking extends block_base {
-	public function init() {
-		$this->title = get_string('ranking', 'block_ranking');
-	}
-	/**
+
+    /**
+     * Sets the block title
+     *
+     * @return void
+     */
+    public function init() {
+        $this->title = get_string('ranking', 'block_ranking');
+    }
+
+    /**
      * Controls the block title based on instance configuration
      *
      * @return bool
@@ -41,30 +48,62 @@ class block_ranking extends block_base {
             $this->title = format_string($this->config->ranking_title);
         }
     }
-	public function get_content() {
-		$this->content = new stdClass;
+
+    /**
+     * Defines where the block can be added
+     *
+     * @return array
+     */
+    public function applicable_formats() {
+        return array(
+            'course-view'    => true,
+            'site'           => false,
+            'mod'            => false,
+            'my'             => false
+        );
+    }
+
+    /**
+     * Creates the blocks main content
+     *
+     * @return string
+     */
+    public function get_content() {
+        $this->content = new stdClass;
         $this->content->text = '';
         $this->content->footer = '';
 
-		$users = block_ranking_get_students($this->config->ranking_rankingsize);
+        $users = block_ranking_get_students($this->config->ranking_rankingsize);
 
-		if(empty($users)) {
-			$this->content->text = get_string('nostudents', 'block_ranking');
-		} else {
-			$this->content->text = block_ranking_print_students($users);
-		}
+        if (empty($users)) {
+            $this->content->text = get_string('nostudents', 'block_ranking');
+        } else {
+            $this->content->text = block_ranking_print_students($users);
+        }
 
         return $this->content;
-	}
-	public function cron() {
+    }
 
-		block_ranking_mirror_completions();;
+    /**
+     * Executes the cron job
+     *
+     * @return bool
+     */
+    public function cron() {
 
-	    block_ranking_calculate_points();
+        block_ranking_mirror_completions();;
+
+        block_ranking_calculate_points();
 
         return true;
     }
-    function has_config() {
-    	return true;
+
+    /**
+     * Allow block instance configuration
+     *
+     * @return bool
+     */
+    public function has_config() {
+        return true;
     }
 }

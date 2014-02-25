@@ -28,7 +28,6 @@ defined('MOODLE_INTERNAL') || die;
 
 if ($ADMIN->fulltree) {
 
-    //--- general settings ---------------------------------------------------------------------------
     $settings->add(new admin_setting_configtext('block_ranking_rankingsize', get_string('rankingsize', 'block_ranking'),
         get_string('rankingsize_help', 'block_ranking'), 10, PARAM_INT));
 
@@ -50,5 +49,3 @@ if ($ADMIN->fulltree) {
     $settings->add(new admin_setting_configtext('block_ranking_defaultpoints', get_string('defaultpoints', 'block_ranking'),
         '', 2, PARAM_INT));
 }
-
-?>
