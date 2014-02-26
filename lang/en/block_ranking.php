@@ -20,7 +20,7 @@
  *
  * @package    contrib
  * @subpackage block_progress
- * @copyright  2010 Michael de Raadt
+ * @copyright  2010 Willian Mano
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
