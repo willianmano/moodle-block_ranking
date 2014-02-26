@@ -28,24 +28,24 @@ defined('MOODLE_INTERNAL') || die;
 
 if ($ADMIN->fulltree) {
 
-    $settings->add(new admin_setting_configtext('block_ranking_rankingsize', get_string('rankingsize', 'block_ranking'),
+    $settings->add(new admin_setting_configtext('block_ranking/rankingsize', get_string('rankingsize', 'block_ranking'),
         get_string('rankingsize_help', 'block_ranking'), 10, PARAM_INT));
 
-    $settings->add(new admin_setting_configtext('block_ranking_resourcepoints', get_string('resourcepoints', 'block_ranking'),
+    $settings->add(new admin_setting_configtext('block_ranking/resourcepoints', get_string('resourcepoints', 'block_ranking'),
         '', 2, PARAM_INT));
 
-    $settings->add(new admin_setting_configtext('block_ranking_assignpoints', get_string('assignpoints', 'block_ranking'),
+    $settings->add(new admin_setting_configtext('block_ranking/assignpoints', get_string('assignpoints', 'block_ranking'),
         '', 2, PARAM_INT));
 
-    $settings->add(new admin_setting_configtext('block_ranking_forumpoints', get_string('forumpoints', 'block_ranking'),
+    $settings->add(new admin_setting_configtext('block_ranking/forumpoints', get_string('forumpoints', 'block_ranking'),
         '', 2, PARAM_INT));
 
-    $settings->add(new admin_setting_configtext('block_ranking_pagepoints', get_string('pagepoints', 'block_ranking'),
+    $settings->add(new admin_setting_configtext('block_ranking/pagepoints', get_string('pagepoints', 'block_ranking'),
         '', 2, PARAM_INT));
 
-    $settings->add(new admin_setting_configtext('block_ranking_workshoppoints', get_string('workshoppoints', 'block_ranking'),
+    $settings->add(new admin_setting_configtext('block_ranking/workshoppoints', get_string('workshoppoints', 'block_ranking'),
         '', 2, PARAM_INT));
 
-    $settings->add(new admin_setting_configtext('block_ranking_defaultpoints', get_string('defaultpoints', 'block_ranking'),
+    $settings->add(new admin_setting_configtext('block_ranking/defaultpoints', get_string('defaultpoints', 'block_ranking'),
         '', 2, PARAM_INT));
 }

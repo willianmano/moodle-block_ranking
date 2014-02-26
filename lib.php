@@ -32,12 +32,15 @@ define ('DEFAULT_POINTS', 2);
  * @return array
  */
 function block_ranking_get_students($limit = null) {
-    global $COURSE, $DB, $PAGE, $CFG;
+    global $COURSE, $DB, $PAGE;
+
+    // Get block ranking configuration.
+    $cfgranking = get_config('block_ranking');
 
     // Get limit from default configuration or instance configuration.
     if (!isset($limit) || !empty(trim($limit))) {
-        if (isset($CFG->block_ranking_rankingsize) && !empty(trim($CFG->block_ranking_rankingsize))) {
-            $limit = $CFG->block_ranking_rankingsize;
+        if (isset($cfgranking->rankingsize) && !empty(trim($cfgranking->rankingsize))) {
+            $limit = $cfgranking->rankingsize;
         } else {
             $limit = 10;
         }
@@ -211,31 +214,32 @@ function get_modules_completion() {
  * @return bool
  */
 function add_point_to_user($usercompletion) {
-    global $CFG;
+    // Get block ranking configuration.
+    $cfgranking = get_config('block_ranking');
 
     switch ($usercompletion->modulename) {
         case 'assign':
-            add_default_points($usercompletion, $CFG->block_ranking_assignpoints);
+            add_default_points($usercompletion, $cfgranking->assignpoints);
         break;
 
         case 'resource':
-            add_default_points($usercompletion, $CFG->block_ranking_resourcepoints);
+            add_default_points($usercompletion, $cfgranking->resourcepoints);
         break;
 
         case 'forum':
-            add_default_points($usercompletion, $CFG->block_ranking_forumpoints);
+            add_default_points($usercompletion, $cfgranking->forumpoints);
         break;
 
         case 'workshop':
-            add_default_points($usercompletion, $CFG->block_ranking_workshoppoints);
+            add_default_points($usercompletion, $cfgranking->workshoppoints);
         break;
 
         case 'page':
-            add_default_points($usercompletion, $CFG->block_ranking_pagepoints);
+            add_default_points($usercompletion, $cfgranking->pagepoints);
         break;
 
         default:
-            add_default_points($usercompletion, $CFG->block_ranking_defaultpoints);
+            add_default_points($usercompletion, $cfgranking->defaultpoints);
         break;
     }
 }

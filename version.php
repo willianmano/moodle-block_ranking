@@ -26,7 +26,7 @@
 
 $plugin->version  = 2014022400;
 $plugin->requires = 2011120511;
-$plugin->maturity = 200;
+$plugin->maturity = MATURITY_STABLE;
 $plugin->release  = 'Version for Moodle 2.2 onwards';
 $plugin->component = 'block_ranking';
 $plugin->cron      = 300;
