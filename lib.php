@@ -38,8 +38,8 @@ function block_ranking_get_students($limit = null) {
     $cfgranking = get_config('block_ranking');
 
     // Get limit from default configuration or instance configuration.
-    if (!isset($limit) || !empty(trim($limit))) {
-        if (isset($cfgranking->rankingsize) && !empty(trim($cfgranking->rankingsize))) {
+    if (!$limit) {
+        if (isset($cfgranking->rankingsize) && trim($cfgranking->rankingsize) != '') {
             $limit = $cfgranking->rankingsize;
         } else {
             $limit = 10;
@@ -252,7 +252,7 @@ function add_point_to_user($usercompletion) {
  * @return bool
  */
 function add_default_points($usercompletion, $points) {
-    if (!isset($points) || !empty(trim($points))) {
+    if (!isset($points) || trim($points) != '') {
         $points = DEFAULT_POINTS;
     }
     if (!is_null($usercompletion->completiongradeitemnumber)) {

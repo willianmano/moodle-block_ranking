@@ -44,7 +44,8 @@ class block_ranking extends block_base {
      * @return bool
      */
     public function specialization() {
-        if (isset($this->config->ranking_title) && !empty(trim($this->config->ranking_title))) {
+        $title = isset($this->config->ranking_title) ? trim($this->config->ranking_title) : '';
+        if (!empty($title)) {
             $this->title = format_string($this->config->ranking_title);
         }
     }
@@ -73,7 +74,8 @@ class block_ranking extends block_base {
         $this->content->text = '';
         $this->content->footer = '';
 
-        $users = block_ranking_get_students($this->config->ranking_rankingsize);
+        $rankingsize = isset($this->config->ranking_rankingsize) ? trim($this->config->ranking_rankingsize) : 0;
+        $users = block_ranking_get_students($rankingsize);
 
         if (empty($users)) {
             $this->content->text = get_string('nostudents', 'block_ranking');
