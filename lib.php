@@ -52,10 +52,10 @@ function block_ranking_get_students($limit = null) {
     $sql = "SELECT
                 DISTINCT $userfields, concat(u.firstname, ' ',u.lastname) as fullname, r.points
             FROM
-                mdl_user u
-            INNER JOIN mdl_role_assignments a ON a.userid = u.id
-            INNER JOIN mdl_ranking_points r ON r.userid = u.id
-            INNER JOIN mdl_context c ON c.id = a.contextid
+                {user} u
+            INNER JOIN {role_assignments} a ON a.userid = u.id
+            INNER JOIN {ranking_points} r ON r.userid = u.id
+            INNER JOIN {context} c ON c.id = a.contextid
             WHERE a.contextid = :contextid
             AND a.userid = u.id
             AND a.roleid = :roleid
@@ -349,8 +349,8 @@ function get_activity_finalgrade($activity, $activityid, $userid) {
     $sql = "SELECT
                 gg.itemid, gg.userid, gg.rawscaleid, gg.finalgrade, gi.scaleid
             FROM
-                mdl_grade_grades gg
-            INNER JOIN mdl_grade_items gi ON gi.id = gg.itemid
+                {grade_grades} gg
+            INNER JOIN {grade_items} gi ON gi.id = gg.itemid
             WHERE gi.itemmodule = :activity AND gi.iteminstance = :iteminstance AND gg.userid = :userid";
     $params['activity'] = $activity;
     $params['iteminstance'] = $activityid;
@@ -381,7 +381,7 @@ function get_activity_finalgrade($activity, $activityid, $userid) {
 function get_finalgrade_by_scale($finalgrade, $scaleid) {
     global $DB;
 
-    $sql = "SELECT scale FROM mdl_scale WHERE id = :scaleid";
+    $sql = "SELECT scale FROM {scale} WHERE id = :scaleid";
     $params['scaleid'] = $scaleid;
 
     $scale = $DB->get_records_sql($sql, $params);
