@@ -15,7 +15,7 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
- * Ranking block upgrade
+ * Ranking block install
  *
  * @package    contrib
  * @subpackage block_ranking
@@ -25,36 +25,22 @@
  */
 
 /**
- * Upgrade the ranking block
- * @param int $oldversion
- * @param object $block
  * @return bool
  */
-
-function xmldb_block_ranking_upgrade($oldversion, $block) {
+function xmldb_block_ranking_install() {
     global $DB;
 
-    if ($oldversion < 2015030300) {
+    $criteria = array(
+        'plugin' => 'block_ranking',
+        'name' => 'lastcomputedid'
+    );
 
-        $criteria = array(
-            'plugin' => 'block_ranking',
-            'name' => 'lastcomputedid'
-        );
-
-        if (!$DB->record_exists('config_plugins', $criteria)) {
-            $criteria['value'] = 0;
-            $DB->insert_record('config_plugins', $criteria, true);
-        }
-
-        // Drop the mirror table.
-        $dbman = $DB->get_manager();
-
-        // Define table to be dropped.
-        $table = new xmldb_table('ranking_cmc_mirror');
-        if ($dbman->table_exists($table)) {
-            $dbman->drop_table($table);
-        }
+    if (!$DB->record_exists('config_plugins', $criteria)) {
+        $criteria['value'] = 0;
+        $DB->insert_record('config_plugins', $criteria, true);
     }
 
     return true;
 }
+
+

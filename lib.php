@@ -107,46 +107,6 @@ function block_ranking_print_students($students) {
     return html_writer::table($table);
 }
 
-// CRON FUNCTIONS.
-
-/**
- * Mirror the course_modules_completion table into the ranking_cmc_mirror table
- *
- * @return bool
- */
-function block_ranking_mirror_completions() {
-    global $DB;
-
-    $completedmodules = get_modules_completion_to_mirror();
-
-    if (!empty($completedmodules)) {
-        foreach ($completedmodules as $key => $module) {
-            $DB->insert_record('ranking_cmc_mirror', $module);
-        }
-    }
-}
-
-/**
- * Returns course_modules_completion data to be mirrored into the ranking_cmc_mirror table
- *
- * @return array
- */
-function get_modules_completion_to_mirror() {
-    global $DB;
-
-    $sql = "SELECT
-                cmc.id as cmcid, cmc.coursemoduleid, cmc.userid, cmc.timemodified as timecreated, cmc.timemodified
-            FROM
-                {course_modules_completion} cmc
-            WHERE
-                cmc.id > (SELECT IFNULL(MAX(cmcid),0) FROM {ranking_cmc_mirror})
-            ORDER BY cmc.id";
-
-    $completedmodules = array_values($DB->get_records_sql($sql));
-
-    return $completedmodules;
-}
-
 /**
  * Function executed by cron to calculate the student points
  *
@@ -157,30 +117,30 @@ function block_ranking_calculate_points() {
 
     mtrace('ranking - entrei');
 
-    $criteria = array(
-        'plugin' => 'block_ranking',
-        'name' => 'lastcomputedid'
-    );
+    // $criteria = array(
+    //     'plugin' => 'block_ranking',
+    //     'name' => 'lastcomputedid'
+    // );
 
-    $lastcomputedid = current($DB->get_records_sql('config_plugins', $criteria));
+    // $lastcomputedid = current($DB->get_records('config_plugins', $criteria));
 
-    $completedmodules = get_modules_completion($lastcomputedid->value);
+    // $completedmodules = get_modules_completion((int)$lastcomputedid->value);
 
-    if (!empty($completedmodules)) {
-        foreach ($completedmodules as $key => $usercompletion) {
-            add_point_to_user($usercompletion);
-        }
+    // if (!empty($completedmodules)) {
+    //     foreach ($completedmodules as $key => $usercompletion) {
+    //         add_point_to_user($usercompletion);
+    //     }
 
-        $lastid = end($completedmodules);
+    //     $lastid = end($completedmodules);
 
-        $lastcomputedid->value = $lastid->cmcid;
+    //     $lastcomputedid->value = $lastid->cmcid;
 
-        $DB->update_record('config_plugins', $lastcomputedid);
+    //     $DB->update_record('config_plugins', $lastcomputedid);
         
-        mtrace('... points computeds :P');
-    } else {
-        mtrace('... No new points to be computed');
-    }
+    //     mtrace('... points computeds :P');
+    // } else {
+    //     mtrace('... No new points to be computed');
+    // }
 }
 
 /**

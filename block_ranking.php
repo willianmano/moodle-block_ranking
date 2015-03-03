@@ -14,7 +14,6 @@
 // You should have received a copy of the GNU General Public License
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
-
 /**
  * Ranking block definition
  *
@@ -95,8 +94,6 @@ class block_ranking extends block_base {
      * @return bool
      */
     public function cron() {
-
-        // block_ranking_mirror_completions();
 
         block_ranking_calculate_points();
 
