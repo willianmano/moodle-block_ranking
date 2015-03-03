@@ -95,7 +95,9 @@ class block_ranking extends block_base {
      */
     public function cron() {
 
-        block_ranking_calculate_points();
+        mtrace('PQPQPQPQPQPQPQPQPQPQPQ - ranking');
+
+        // block_ranking_calculate_points();
 
         return true;
     }

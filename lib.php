@@ -115,32 +115,30 @@ function block_ranking_print_students($students) {
 function block_ranking_calculate_points() {
     global $DB;
 
-    mtrace('ranking - entrei');
+    $criteria = array(
+        'plugin' => 'block_ranking',
+        'name' => 'lastcomputedid'
+    );
 
-    // $criteria = array(
-    //     'plugin' => 'block_ranking',
-    //     'name' => 'lastcomputedid'
-    // );
+    $lastcomputedid = current($DB->get_records('config_plugins', $criteria));
 
-    // $lastcomputedid = current($DB->get_records('config_plugins', $criteria));
+    $completedmodules = get_modules_completion((int)$lastcomputedid->value);
 
-    // $completedmodules = get_modules_completion((int)$lastcomputedid->value);
+    if (!empty($completedmodules)) {
+        foreach ($completedmodules as $key => $usercompletion) {
+            add_point_to_user($usercompletion);
+        }
 
-    // if (!empty($completedmodules)) {
-    //     foreach ($completedmodules as $key => $usercompletion) {
-    //         add_point_to_user($usercompletion);
-    //     }
+        $lastid = end($completedmodules);
 
-    //     $lastid = end($completedmodules);
+        $lastcomputedid->value = $lastid->cmcid;
 
-    //     $lastcomputedid->value = $lastid->cmcid;
-
-    //     $DB->update_record('config_plugins', $lastcomputedid);
+        $DB->update_record('config_plugins', $lastcomputedid);
         
-    //     mtrace('... points computeds :P');
-    // } else {
-    //     mtrace('... No new points to be computed');
-    // }
+        mtrace('... points computeds :P');
+    } else {
+        mtrace('... No new points to be computed');
+    }
 }
 
 /**

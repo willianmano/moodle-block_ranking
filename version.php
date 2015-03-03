@@ -32,4 +32,4 @@ $plugin->requires = 2011120511;
 $plugin->maturity = MATURITY_STABLE;
 $plugin->release  = 'Version for Moodle 2.8 onwards';
 $plugin->component = 'block_ranking';
-$plugin->cron      = 300;
+$plugin->cron      = 5;
