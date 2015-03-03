@@ -27,9 +27,9 @@
 
 defined('MOODLE_INTERNAL') || die();
 
-$plugin->version  = 2015030300;
-$plugin->requires = 2011120511;
-$plugin->maturity = MATURITY_STABLE;
-$plugin->release  = 'Version for Moodle 2.8 onwards';
+$plugin->version   = 2015030300;
+$plugin->requires  = 2011120511;
+$plugin->maturity  = MATURITY_STABLE;
+$plugin->release   = 'Version for Moodle 2.8 onwards';
 $plugin->component = 'block_ranking';
-$plugin->cron      = 5;
+$plugin->cron      = 300;
