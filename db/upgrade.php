@@ -16,7 +16,7 @@
 
 
 /**
- * Ranking block capability setup
+ * Ranking block upgrade
  *
  * @package    contrib
  * @subpackage block_ranking
@@ -25,19 +25,36 @@
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
-defined('MOODLE_INTERNAL') or die("Direct access to this location is not allowed.");
+/**
+ * Upgrade the ranking block
+ * @param int $oldversion
+ * @param object $block
+ * @return bool
+ */
+function xmldb_block_ranking_upgrade($oldversion, $block) {
+    global $DB;
 
-$capabilities = array(
-    'block/ranking:addinstance' => array(
-        'riskbitmask' => RISK_SPAM | RISK_XSS,
+    if ($oldversion < 2015030500) {
 
-        'captype' => 'write',
-        'contextlevel' => CONTEXT_BLOCK,
-        'archetypes' => array(
-            'editingteacher' => CAP_ALLOW,
-            'manager' => CAP_ALLOW
-        ),
+        $criteria = array(
+            'plugin' => 'block_ranking',
+            'name' => 'lastcomputedid'
+        );
 
-        'clonepermissionsfrom' => 'moodle/site:manageblocks'
-    ),
-);
+        if (!$DB->record_exists('config_plugins', $criteria)) {
+            $criteria['value'] = 0;
+            $DB->insert_record('config_plugins', $criteria, true);
+        }
+
+        // Drop the mirror table.
+        $dbman = $DB->get_manager();
+
+        // Define table to be dropped.
+        $table = new xmldb_table('ranking_cmc_mirror');
+        if ($dbman->table_exists($table)) {
+            $dbman->drop_table($table);
+        }
+    }
+
+    return true;
+}

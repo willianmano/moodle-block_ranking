@@ -20,7 +20,8 @@
  *
  * @package    contrib
  * @subpackage block_ranking
- * @copyright  2014 Willian Mano
+ * @copyright  2015 Willian Mano http://willianmano.net
+ * @authors    Willian Mano
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
@@ -119,10 +120,6 @@ function block_ranking_mirror_completions() {
     $completedmodules = get_modules_completion_to_mirror();
 
     if (!empty($completedmodules)) {
-        $lastid = end($completedmodules);
-        // Last id inserted.
-        $lastid = $lastid->cmcid;
-
         foreach ($completedmodules as $key => $module) {
             $DB->insert_record('ranking_cmc_mirror', $module);
         }
@@ -158,12 +155,28 @@ function get_modules_completion_to_mirror() {
 function block_ranking_calculate_points() {
     global $DB;
 
-    $completedmodules = get_modules_completion();
+    mtrace('ranking - entrei');
+
+    $criteria = array(
+        'plugin' => 'block_ranking',
+        'name' => 'lastcomputedid'
+    );
+
+    $lastcomputedid = current($DB->get_records_sql('config_plugins', $criteria));
+
+    $completedmodules = get_modules_completion($lastcomputedid->value);
 
     if (!empty($completedmodules)) {
         foreach ($completedmodules as $key => $usercompletion) {
             add_point_to_user($usercompletion);
         }
+
+        $lastid = end($completedmodules);
+
+        $lastcomputedid->value = $lastid->cmcid;
+
+        $DB->update_record('config_plugins', $lastcomputedid);
+        
         mtrace('... points computeds :P');
     } else {
         mtrace('... No new points to be computed');
@@ -175,11 +188,12 @@ function block_ranking_calculate_points() {
  *
  * @return array
  */
-function get_modules_completion() {
+function get_modules_completion($lastcomputedid) {
     global $DB;
 
     $sql = "SELECT
                 cmc.*,
+                cmc.id as cmcid
                 cm.course,
                 cm.module as moduleid,
                 cm.instance,
@@ -189,23 +203,19 @@ function get_modules_completion() {
                 cm.completiongradeitemnumber,
                 cm.completionview,
                 cm.completionexpected,
-                ccc.module,
-                ccc.moduleinstance,
-                m.name as modulename,
-                cmcm.id as cmcmid
+                m.name as modulename
             FROM
-                {course_modules_completion} cmc
-            INNER JOIN {course_modules} cm ON cm.id = cmc.coursemoduleid
-            INNER JOIN {modules} m ON m.id = cm.module
-            INNER JOIN {course_completion_criteria} ccc ON
-                (ccc.course = cm.course AND ccc.module = m.name AND cm.id = ccc.moduleinstance)
-            INNER JOIN {ranking_cmc_mirror} cmcm ON cmcm.cmcid = cmc.id
+                mdl_course_modules_completion cmc
+            INNER JOIN mdl_course_modules cm ON cm.id = cmc.coursemoduleid
+            INNER JOIN mdl_modules m ON m.id = cm.module
             WHERE
                 cmc.completionstate = 1
-                AND cmcm.computed = 0
+                AND cmc.id > :lastcomputedid
             ORDER BY cmc.id";
 
-    $completedmodules = array_values($DB->get_records_sql($sql));
+    $params['lastcomputedid'] = $lastcomputedid;
+
+    $completedmodules = array_values($DB->get_records_sql($sql, $params));
 
     return $completedmodules;
 }

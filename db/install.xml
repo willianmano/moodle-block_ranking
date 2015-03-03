@@ -17,7 +17,7 @@
         <KEY NAME="primary" TYPE="primary" FIELDS="id" COMMENT="Primary key for ranking_points"/>
       </KEYS>
     </TABLE>
-    <TABLE NAME="ranking_logs" COMMENT="Points of users" PREVIOUS="ranking_points" NEXT="ranking_cmc_mirror">
+    <TABLE NAME="ranking_logs" COMMENT="Points of users" PREVIOUS="ranking_points">
       <FIELDS>
         <FIELD NAME="id" TYPE="int" LENGTH="10" NOTNULL="true" UNSIGNED="true" SEQUENCE="true" ENUM="false" NEXT="rankingid"/>
         <FIELD NAME="rankingid" TYPE="int" LENGTH="10" NOTNULL="true" UNSIGNED="true" SEQUENCE="false" ENUM="false" PREVIOUS="id" NEXT="courseid"/>
@@ -25,20 +25,6 @@
         <FIELD NAME="course_modules_completion" TYPE="int" LENGTH="10" NOTNULL="true" UNSIGNED="true" SEQUENCE="false" ENUM="false" PREVIOUS="courseid" NEXT="points"/>
         <FIELD NAME="points" TYPE="number" LENGTH="10" DECIMALS="1" NOTNULL="true" SEQUENCE="false" ENUM="false" PREVIOUS="course_modules_completion" NEXT="timecreated"/>
         <FIELD NAME="timecreated" TYPE="int" LENGTH="10" NOTNULL="true" UNSIGNED="true" SEQUENCE="false" ENUM="false" PREVIOUS="points"/>
-      </FIELDS>
-      <KEYS>
-        <KEY NAME="primary" TYPE="primary" FIELDS="id" COMMENT="Primary key for ranking_points"/>
-      </KEYS>
-    </TABLE>
-    <TABLE NAME="ranking_cmc_mirror" COMMENT="Mirror of mdl_course_modules_completion table" PREVIOUS="ranking_logs">
-      <FIELDS>
-        <FIELD NAME="id" TYPE="int" LENGTH="10" NOTNULL="true" UNSIGNED="true" SEQUENCE="true" ENUM="false" NEXT="cmcid"/>
-        <FIELD NAME="cmcid" TYPE="int" LENGTH="10" NOTNULL="true" UNSIGNED="true" SEQUENCE="false" ENUM="false" PREVIOUS="id" NEXT="coursemoduleid"/>
-        <FIELD NAME="coursemoduleid" TYPE="int" LENGTH="10" NOTNULL="true" UNSIGNED="true" SEQUENCE="false" ENUM="false" PREVIOUS="cmcid" NEXT="userid"/>
-        <FIELD NAME="userid" TYPE="int" LENGTH="10" NOTNULL="true" UNSIGNED="true" SEQUENCE="false" ENUM="false" PREVIOUS="coursemoduleid" NEXT="computed"/>
-        <FIELD NAME="computed" TYPE="int" LENGTH="1" NOTNULL="true" SEQUENCE="false" ENUM="false" DEFAULT="0" PREVIOUS="userid" NEXT="timecreated"/>
-        <FIELD NAME="timecreated" TYPE="int" LENGTH="10" NOTNULL="true" UNSIGNED="true" SEQUENCE="false" ENUM="false" PREVIOUS="computed" NEXT="timemodified"/>
-        <FIELD NAME="timemodified" TYPE="int" LENGTH="10" NOTNULL="true" UNSIGNED="true" SEQUENCE="false" ENUM="false" PREVIOUS="timecreated"/>
       </FIELDS>
       <KEYS>
         <KEY NAME="primary" TYPE="primary" FIELDS="id" COMMENT="Primary key for ranking_points"/>

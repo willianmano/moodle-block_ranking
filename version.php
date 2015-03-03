@@ -20,13 +20,16 @@
  *
  * @package    contrib
  * @subpackage block_ranking
- * @copyright  2014 Willian Mano
+ * @copyright  2015 Willian Mano http://willianmano.net
+ * @authors    Willian Mano
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
-$plugin->version  = 2014022400;
+defined('MOODLE_INTERNAL') || die();
+
+$plugin->version  = 2015030500;
 $plugin->requires = 2011120511;
 $plugin->maturity = MATURITY_STABLE;
-$plugin->release  = 'Version for Moodle 2.2 onwards';
+$plugin->release  = 'Version for Moodle 2.8 onwards';
 $plugin->component = 'block_ranking';
 $plugin->cron      = 300;

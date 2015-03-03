@@ -20,9 +20,12 @@
  *
  * @package    contrib
  * @subpackage block_ranking
- * @copyright  2014 Willian Mano
+ * @copyright  2015 Willian Mano http://willianmano.net
+ * @authors    Willian Mano
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
+
+defined('MOODLE_INTERNAL') || die();
 
 require_once(dirname(__FILE__) . '/../../config.php');
 require_once($CFG->dirroot.'/blocks/ranking/lib.php');
@@ -93,7 +96,7 @@ class block_ranking extends block_base {
      */
     public function cron() {
 
-        block_ranking_mirror_completions();;
+        // block_ranking_mirror_completions();
 
         block_ranking_calculate_points();
 
