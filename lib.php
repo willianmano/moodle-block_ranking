@@ -151,7 +151,7 @@ function get_modules_completion($lastcomputedid) {
 
     $sql = "SELECT
                 cmc.*,
-                cmc.id as cmcid
+                cmc.id as cmcid,
                 cm.course,
                 cm.module as moduleid,
                 cm.instance,
@@ -230,7 +230,6 @@ function add_default_points($usercompletion, $points) {
 
     $rankingid = add_or_update_user_points($usercompletion->userid, $usercompletion->course, $points);
     add_ranking_log($rankingid, $usercompletion->course, $usercompletion->id, $points);
-    update_cmcm_completed($usercompletion->cmcmid);
 }
 
 /**
@@ -286,22 +285,6 @@ function add_ranking_log($rankingid, $courseid, $cmc, $points) {
     $logid = $DB->insert_record('ranking_logs', $rankinglog, true);
 
     return $logid;
-}
-
-/**
- * Mark completed completions as computed
- *
- * @return bool
- */
-function update_cmcm_completed($cmcid) {
-    global $DB;
-
-    $data = new stdClass();
-    $data->id = $cmcid;
-    $data->computed = 1;
-    $data->updated = time();
-
-    $DB->update_record('ranking_cmc_mirror', $data);
 }
 
 // GET GRADES.
