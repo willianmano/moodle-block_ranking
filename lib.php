@@ -51,7 +51,7 @@ function block_ranking_get_students($limit = null) {
 
     $userfields = user_picture::fields('u', array('username'));
     $sql = "SELECT
-                DISTINCT $userfields, concat(u.firstname, ' ',u.lastname) as fullname, r.points
+                DISTINCT $userfields, r.points
             FROM
                 {user} u
             INNER JOIN {role_assignments} a ON a.userid = u.id
@@ -62,7 +62,7 @@ function block_ranking_get_students($limit = null) {
             AND a.roleid = :roleid
             AND c.instanceid = :courseid
             AND r.courseid = :crsid
-            ORDER BY r.points DESC
+            ORDER BY r.points DESC, u.firstname ASC
             LIMIT " . $limit;
     $params['contextid'] = $context->id;
     $params['roleid'] = 5;
@@ -74,13 +74,91 @@ function block_ranking_get_students($limit = null) {
     return $users;
 }
 
+function block_ranking_get_students_by_date($limit = null, $datestart, $dateend) {
+    global $COURSE, $DB, $PAGE;
+
+    // Get block ranking configuration.
+    $cfgranking = get_config('block_ranking');
+
+    // Get limit from default configuration or instance configuration.
+    if (!$limit) {
+        if (isset($cfgranking->rankingsize) && trim($cfgranking->rankingsize) != '') {
+            $limit = $cfgranking->rankingsize;
+        } else {
+            $limit = 10;
+        }
+    }
+
+    $context = $PAGE->context;
+
+    $userfields = user_picture::fields('u', array('username'));
+    $sql = "SELECT
+                DISTINCT $userfields,
+                sum(rl.points) as points
+            FROM
+                {user} u
+            INNER JOIN {role_assignments} a ON a.userid = u.id
+            INNER JOIN {ranking_points} r ON r.userid = u.id
+            INNER JOIN {ranking_logs} rl ON rl.rankingid = r.id
+            INNER JOIN {context} c ON c.id = a.contextid
+            WHERE a.contextid = :contextid
+            AND a.userid = u.id
+            AND a.roleid = :roleid
+            AND c.instanceid = :courseid
+            AND r.courseid = :crsid
+            AND rl.timecreated BETWEEN :weekstart AND :weekend
+            GROUP BY rankingid 
+            ORDER BY points DESC, u.firstname ASC
+            LIMIT " . $limit;
+
+    $params['contextid'] = $context->id;
+    $params['roleid'] = 5;
+    $params['courseid'] = $COURSE->id;
+    $params['crsid'] = $COURSE->id;
+    $params['weekstart'] = $datestart;
+    $params['weekend'] = $dateend;
+
+    $users = array_values($DB->get_records_sql($sql, $params));
+
+    return $users;
+}
+
 /**
  * Build the ranking table to be viewd in the course
- * @param array $students List of students to be print in ranking block
+ * @param array $rankingGeral List of students to be print in ranking block
  * @return string
  */
-function block_ranking_print_students($students) {
-    global $OUTPUT, $USER;
+function block_ranking_print_students($rankingLastMonth, $rankingLastWeek, $rankingGeral) {
+    global $PAGE;
+
+    $tableLastWeek = generateTable($rankingLastWeek);
+    $tableLastMonth = generateTable($rankingLastMonth);
+    $tableGeral = generateTable($rankingGeral);
+
+    // return html_writer::table($table);
+
+    $PAGE->requires->js_init_call('M.block_ranking.init_tabview');
+
+    return '<div id="ranking-tabs">
+                <ul>
+                    <li><a href="#semanal">Semanal</a></li>
+                    <li><a href="#mensal">Mensal</a></li>
+                    <li><a href="#geral">Geral</a></li>
+                </ul>
+                <div>
+                    <div id="semanal">'.html_writer::table($tableLastWeek).'</div>
+                    <div id="mensal">'.html_writer::table($tableLastMonth).'</div>
+                    <div id="geral">'.html_writer::table($tableGeral).'</div>
+                </div>
+            </div>';
+}
+
+function generateTable($data) {
+    global $USER, $OUTPUT;
+
+    if(empty($data)) {
+        return $this->content->text = get_string('nostudents', 'block_ranking');
+    }
 
     $table = new html_table();
     $table->attributes = array("class" => "rankingTable table table-striped generaltable");
@@ -89,22 +167,22 @@ function block_ranking_print_students($students) {
                         get_string('table_name', 'block_ranking'),
                         get_string('table_points', 'block_ranking')
                     );
-    for ($i = 0; $i < count($students); $i++) {
+    for ($i = 0; $i < count($data); $i++) {
         $row = new html_table_row();
 
         // Verify if the logged user is one user in ranking.
-        if ($students[$i]->id == $USER->id) {
+        if ($data[$i]->id == $USER->id) {
             $row->attributes = array('class' => 'itsme');
         }
         $row->cells = array(
                         ($i + 1),
-                        $OUTPUT->user_picture($students[$i], array('size' => 24, 'alttext' => false)) . ' '.$students[$i]->fullname,
-                        $students[$i]->points
+                        $OUTPUT->user_picture($data[$i], array('size' => 24, 'alttext' => false)) . ' '.$data[$i]->firstname,
+                        $data[$i]->points
                     );
         $table->data[] = $row;
     }
 
-    return html_writer::table($table);
+    return $table;
 }
 
 /**

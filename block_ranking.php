@@ -77,13 +77,21 @@ class block_ranking extends block_base {
         $this->content->footer = '';
 
         $rankingsize = isset($this->config->ranking_rankingsize) ? trim($this->config->ranking_rankingsize) : 0;
-        $users = block_ranking_get_students($rankingsize);
+        // $users = block_ranking_get_students($rankingsize);
 
-        if (empty($users)) {
-            $this->content->text = get_string('nostudents', 'block_ranking');
-        } else {
-            $this->content->text = block_ranking_print_students($users);
-        }
+        // if (empty($users)) {
+        //     $this->content->text = get_string('nostudents', 'block_ranking');
+        // } else {
+            $monthstart = strtotime(date('Y-m-01'));
+            $rankingLastMonth = block_ranking_get_students_by_date($rankingsize, $monthstart, time());
+
+            $weekstart = strtotime(date('d-m-Y', strtotime('-'.date('w').' days')));
+            $rankingLastWeek = block_ranking_get_students_by_date($rankingsize, $weekstart, time());
+            
+            $rankingGeral = block_ranking_get_students($rankingsize);
+
+            $this->content->text = block_ranking_print_students($rankingLastMonth, $rankingLastWeek, $rankingGeral);
+        // }
 
         return $this->content;
     }
