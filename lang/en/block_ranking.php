@@ -48,3 +48,7 @@ $string['forumpoints'] = 'Points to forum';
 $string['pagepoints'] = 'Points to page';
 $string['workshoppoints'] = 'Points to workshop';
 $string['defaultpoints'] = 'Default points';
+
+$string['monthly'] = 'Monthly';
+$string['weekly'] = 'Weekly';
+$string['general'] = 'General';

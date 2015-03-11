@@ -48,3 +48,7 @@ $string['forumpoints'] = 'Pontos para fórum';
 $string['pagepoints'] = 'Pontos para página html';
 $string['workshoppoints'] = 'Pontos para laboratório de avaliação';
 $string['defaultpoints'] = 'Pontuação padrão';
+
+$string['monthly'] = 'Mensal';
+$string['weekly'] = 'Semanal';
+$string['general'] = 'Geral';

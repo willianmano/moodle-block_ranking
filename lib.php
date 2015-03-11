@@ -141,14 +141,14 @@ function block_ranking_print_students($rankingLastMonth, $rankingLastWeek, $rank
 
     return '<div id="ranking-tabs">
                 <ul>
-                    <li><a href="#semanal">Semanal</a></li>
-                    <li><a href="#mensal">Mensal</a></li>
-                    <li><a href="#geral">Geral</a></li>
+                    <li><a href="#semanal">'.get_string('weekly', 'block_ranking').'</a></li>
+                    <li><a href="#mensal">'.get_string('monthly', 'block_ranking').'</a></li>
+                    <li><a href="#geral">'.get_string('general', 'block_ranking').'</a></li>
                 </ul>
                 <div>
-                    <div id="semanal">'.html_writer::table($tableLastWeek).'</div>
-                    <div id="mensal">'.html_writer::table($tableLastMonth).'</div>
-                    <div id="geral">'.html_writer::table($tableGeral).'</div>
+                    <div id="semanal">'.$tableLastWeek.'</div>
+                    <div id="mensal">'.$tableLastMonth.'</div>
+                    <div id="geral">'.$tableGeral.'</div>
                 </div>
             </div>';
 }
@@ -157,7 +157,7 @@ function generateTable($data) {
     global $USER, $OUTPUT;
 
     if(empty($data)) {
-        return $this->content->text = get_string('nostudents', 'block_ranking');
+        return get_string('nostudents', 'block_ranking');
     }
 
     $table = new html_table();
@@ -182,7 +182,7 @@ function generateTable($data) {
         $table->data[] = $row;
     }
 
-    return $table;
+    return html_writer::table($table);
 }
 
 /**
