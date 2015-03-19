@@ -1,3 +1,33 @@
 .block_ranking .rankingTable tr.itsme {
     border: 2px solid #ffba00;
 }
+
+.block_ranking #ranking-tabs ul {
+    border: solid #15629F;
+    border-width: 0 0 5px;
+}
+
+.block_ranking #ranking-tabs ul li a {
+    background-color: #fff;
+    margin-right: 2px;
+    line-height: 1.42857143;
+    border-radius: 4px 4px 0 0;
+    padding: 7px 20px;
+}
+
+.block_ranking #ranking-tabs ul .yui3-tab-selected .yui3-tab-label{
+    background: #15629F;
+    border-color: #15629F;
+}
+
+.ranking-report .groupselector {
+    text-align: center;
+    display: block;
+}
+
+.block_ranking .content .footer {
+    margin-top: 10px;
+    text-align: center;
+}
+
+/*report-table*/

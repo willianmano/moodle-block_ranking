@@ -26,36 +26,78 @@
  */
 
 require(__DIR__ . '/../../config.php');
+require_once($CFG->libdir.'/tablelib.php');
+require_once($CFG->dirroot.'/blocks/ranking/lib.php');
+
+define('DEFAULT_PAGE_SIZE', 100);
 
 $courseid = required_param('courseid', PARAM_INT);
-$userid = optional_param('userid', null, PARAM_INT);
-$resetdata = optional_param('resetdata', 0, PARAM_INT);
+$perpage = optional_param('perpage', DEFAULT_PAGE_SIZE, PARAM_INT); // How many per page.
+$group = optional_param('group', null, PARAM_INT);
 $action = optional_param('action', null, PARAM_ALPHA);
-$confirm = optional_param('confirm', 0, PARAM_INT);
+
+$course = $DB->get_record('course', array('id' => $courseid), '*', MUST_EXIST);
 
 require_login($courseid);
 $context = context_course::instance($courseid);
-
-// We need to be able to add this block to edit the course properties.
-require_capability('block/ranking:addinstance', $context);
 
 // Some stuff.
 $url = new moodle_url('/blocks/ranking/report.php', array('courseid' => $courseid));
 if ($action) {
     $url->param('action', $action);
 }
-$strcoursereport = 'Relatório do curso';
 
 // Page info.
 $PAGE->set_context($context);
 $PAGE->set_pagelayout('course');
-$PAGE->set_title($strcoursereport);
 $PAGE->set_heading($COURSE->fullname);
 $PAGE->set_url($url);
 
+$userfields = user_picture::fields('u', array('username'));
+$from = "FROM {user} u
+        INNER JOIN {role_assignments} a ON a.userid = u.id
+        LEFT JOIN {ranking_points} r ON r.userid = u.id
+        INNER JOIN {context} c ON c.id = a.contextid";
+
+$where = "WHERE a.contextid = :contextid
+        AND a.userid = u.id
+        AND a.roleid = :roleid
+        AND c.instanceid = :courseid";
+
+$params['contextid'] = $context->id;
+$params['roleid'] = 5;
+$params['courseid'] = $COURSE->id;
+
+$order = "ORDER BY r.points DESC, u.firstname ASC
+        LIMIT " . $perpage;
+
+if($group) {
+    $from .= " INNER JOIN {groups_members} gm ON gm.userid = u.id AND gm.groupid = :groupid";
+    $params['groupid'] = $group;
+}
+
+$students = array_values($DB->get_records_sql("SELECT $userfields, r.points $from $where $order", $params));
+
+$strcoursereport = "Nenhum estudante no ranking ainda";
+if(count($students)) {
+    $strcoursereport = "Detalhes do ranking: ". count($students) ." primeiros estudantes";
+}
+
 echo $OUTPUT->header();
 echo $OUTPUT->heading($strcoursereport);
+$PAGE->set_title($strcoursereport);
 
-// Displaying the report.
+// Output group selector if there are groups in the course.
+echo $OUTPUT->container_start('ranking-report');
+
+if(($course->groupmode == SEPARATEGROUPS and has_capability('moodle/site:accessallgroups', $context))) {
+    $groups = groups_get_all_groups($course->id);
+    if (!empty($groups)) {
+        groups_print_course_menu($course, $PAGE->url);
+    }
+}
+
+echo generateTable($students);
+echo $OUTPUT->container_end();
 
 echo $OUTPUT->footer();

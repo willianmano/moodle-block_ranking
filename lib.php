@@ -167,6 +167,8 @@ function generateTable($data) {
                         get_string('table_name', 'block_ranking'),
                         get_string('table_points', 'block_ranking')
                     );
+    $lastpos = 1;
+    $lastpoints = current($data)->points;
     for ($i = 0; $i < count($data); $i++) {
         $row = new html_table_row();
 
@@ -174,10 +176,16 @@ function generateTable($data) {
         if ($data[$i]->id == $USER->id) {
             $row->attributes = array('class' => 'itsme');
         }
+
+        if($lastpoints > $data[$i]->points) {
+            $lastpos++;
+            $lastpoints = $data[$i]->points;
+        }
+
         $row->cells = array(
-                        ($i + 1),
+                        $lastpos,
                         $OUTPUT->user_picture($data[$i], array('size' => 24, 'alttext' => false)) . ' '.$data[$i]->firstname,
-                        $data[$i]->points
+                        $data[$i]->points ?: '-'
                     );
         $table->data[] = $row;
     }
@@ -241,9 +249,9 @@ function get_modules_completion($lastcomputedid) {
                 cm.completionexpected,
                 m.name as modulename
             FROM
-                mdl_course_modules_completion cmc
-            INNER JOIN mdl_course_modules cm ON cm.id = cmc.coursemoduleid
-            INNER JOIN mdl_modules m ON m.id = cm.module
+                {course_modules_completion} cmc
+            INNER JOIN {course_modules} cm ON cm.id = cmc.coursemoduleid
+            INNER JOIN {modules} m ON m.id = cm.module
             WHERE
                 cmc.completionstate = 1
                 AND cmc.id > :lastcomputedid

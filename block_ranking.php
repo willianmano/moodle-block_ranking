@@ -88,12 +88,10 @@ class block_ranking extends block_base {
 
         $this->content->text = block_ranking_print_students($rankingLastMonth, $rankingLastWeek, $rankingGeral);
 
-        if (has_capability('block/ranking:addinstance', $this->page->context)) {
-            $this->content->footer .= html_writer::tag('p',
-                                            html_writer::link(
-                                                new moodle_url('/blocks/ranking/report.php', array('courseid' => $this->page->course->id)), 'Relatórios')
-                                      );
-        }
+        $this->content->footer .= html_writer::tag('p',
+                                        html_writer::link(
+                                            new moodle_url('/blocks/ranking/report.php', array('courseid' => $this->page->course->id)), 'Ver ranking completo', array('class' => 'btn btn-default'))
+                                  );
 
         return $this->content;
     }
