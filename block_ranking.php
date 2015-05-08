@@ -77,20 +77,26 @@ class block_ranking extends block_base {
         $this->content->footer = '';
 
         $rankingsize = isset($this->config->ranking_rankingsize) ? trim($this->config->ranking_rankingsize) : 0;
-        
+
         $monthstart = strtotime(date('Y-m-01'));
-        $rankingLastMonth = block_ranking_get_students_by_date($rankingsize, $monthstart, time());
+        $rankinglastmonth = block_ranking_get_students_by_date($rankingsize, $monthstart, time());
 
         $weekstart = strtotime(date('d-m-Y', strtotime('-'.date('w').' days')));
-        $rankingLastWeek = block_ranking_get_students_by_date($rankingsize, $weekstart, time());
-        
-        $rankingGeral = block_ranking_get_students($rankingsize);
+        $rankinglastweek = block_ranking_get_students_by_date($rankingsize, $weekstart, time());
 
-        $this->content->text = block_ranking_print_students($rankingLastMonth, $rankingLastWeek, $rankingGeral);
+        $rankinggeral = block_ranking_get_students($rankingsize);
+
+        $this->content->text = block_ranking_print_students($rankinglastmonth, $rankinglastweek, $rankinggeral);
 
         $this->content->footer .= html_writer::tag('p',
                                         html_writer::link(
-                                            new moodle_url('/blocks/ranking/report.php', array('courseid' => $this->page->course->id)), 'Ver ranking completo', array('class' => 'btn btn-default'))
+                                            new moodle_url(
+                                                '/blocks/ranking/report.php',
+                                                array('courseid' => $this->page->course->id)
+                                            ),
+                                            get_string('see_full_ranking', 'block_ranking'),
+                                            array('class' => 'btn btn-default')
+                                        )
                                   );
 
         return $this->content;

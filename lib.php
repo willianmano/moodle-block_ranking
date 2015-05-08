@@ -27,6 +27,9 @@
 
 define ('DEFAULT_POINTS', 2);
 
+// Store the courses contexts.
+$coursescontexts = array();
+
 /**
  * Return the list of students in the course ranking
  *
@@ -107,7 +110,7 @@ function block_ranking_get_students_by_date($limit = null, $datestart, $dateend)
             AND c.instanceid = :courseid
             AND r.courseid = :crsid
             AND rl.timecreated BETWEEN :weekstart AND :weekend
-            GROUP BY rankingid 
+            GROUP BY rankingid
             ORDER BY points DESC, u.firstname ASC
             LIMIT " . $limit;
 
@@ -125,17 +128,17 @@ function block_ranking_get_students_by_date($limit = null, $datestart, $dateend)
 
 /**
  * Build the ranking table to be viewd in the course
- * @param array $rankingGeral List of students to be print in ranking block
+ * @param array $rankinglastmonth List of students of the last month ranking
+ * @param array $rankinglastweek List of students of the last week ranking
+ * @param array $rankinggeral List of students to be print in ranking block
  * @return string
  */
-function block_ranking_print_students($rankingLastMonth, $rankingLastWeek, $rankingGeral) {
+function block_ranking_print_students($rankinglastmonth, $rankinglastweek, $rankinggeral) {
     global $PAGE;
 
-    $tableLastWeek = generateTable($rankingLastWeek);
-    $tableLastMonth = generateTable($rankingLastMonth);
-    $tableGeral = generateTable($rankingGeral);
-
-    // return html_writer::table($table);
+    $tablelastweek = generate_table($rankinglastweek);
+    $tablelastmonth = generate_table($rankinglastmonth);
+    $tablegeral = generate_table($rankinggeral);
 
     $PAGE->requires->js_init_call('M.block_ranking.init_tabview');
 
@@ -146,17 +149,17 @@ function block_ranking_print_students($rankingLastMonth, $rankingLastWeek, $rank
                     <li><a href="#geral">'.get_string('general', 'block_ranking').'</a></li>
                 </ul>
                 <div>
-                    <div id="semanal">'.$tableLastWeek.'</div>
-                    <div id="mensal">'.$tableLastMonth.'</div>
-                    <div id="geral">'.$tableGeral.'</div>
+                    <div id="semanal">'.$tablelastweek.'</div>
+                    <div id="mensal">'.$tablelastmonth.'</div>
+                    <div id="geral">'.$tablegeral.'</div>
                 </div>
             </div>';
 }
 
-function generateTable($data) {
+function generate_table($data) {
     global $USER, $OUTPUT;
 
-    if(empty($data)) {
+    if (empty($data)) {
         return get_string('nostudents', 'block_ranking');
     }
 
@@ -177,7 +180,7 @@ function generateTable($data) {
             $row->attributes = array('class' => 'itsme');
         }
 
-        if($lastpoints > $data[$i]->points) {
+        if ($lastpoints > $data[$i]->points) {
             $lastpos++;
             $lastpoints = $data[$i]->points;
         }
@@ -191,40 +194,6 @@ function generateTable($data) {
     }
 
     return html_writer::table($table);
-}
-
-/**
- * Function executed by cron to calculate the student points
- *
- * @return bool
- */
-function block_ranking_calculate_points() {
-    global $DB;
-
-    $criteria = array(
-        'plugin' => 'block_ranking',
-        'name' => 'lastcomputedid'
-    );
-
-    $lastcomputedid = current($DB->get_records('config_plugins', $criteria));
-
-    $completedmodules = get_modules_completion((int)$lastcomputedid->value);
-
-    if (!empty($completedmodules)) {
-        foreach ($completedmodules as $key => $usercompletion) {
-            add_point_to_user($usercompletion);
-        }
-
-        $lastid = end($completedmodules);
-
-        $lastcomputedid->value = $lastid->cmcid;
-
-        $DB->update_record('config_plugins', $lastcomputedid);
-        
-        mtrace('... points computeds :P');
-    } else {
-        mtrace('... No new points to be computed');
-    }
 }
 
 /**
@@ -262,6 +231,46 @@ function get_modules_completion($lastcomputedid) {
     $completedmodules = array_values($DB->get_records_sql($sql, $params));
 
     return $completedmodules;
+}
+
+/**
+ * Function executed by cron to calculate the student points
+ *
+ * @return bool
+ */
+function block_ranking_calculate_points() {
+    global $DB;
+
+    $criteria = array(
+        'plugin' => 'block_ranking',
+        'name' => 'lastcomputedid'
+    );
+
+    $lastcomputedid = current($DB->get_records('config_plugins', $criteria));
+
+    $completedmodules = get_modules_completion((int)$lastcomputedid->value);
+
+    if (!empty($completedmodules)) {
+        foreach ($completedmodules as $key => $usercompletion) {
+
+            $coursecontext = get_context_course($usercompletion->course);
+
+            if (is_student($coursecontext, $usercompletion->userid)) {
+                add_point_to_user($usercompletion);
+            }
+
+        }
+
+        $lastid = end($completedmodules);
+
+        $lastcomputedid->value = $lastid->cmcid;
+
+        $DB->update_record('config_plugins', $lastcomputedid);
+
+        mtrace('... points computeds :P');
+    } else {
+        mtrace('... No new points to be computed');
+    }
 }
 
 /**
@@ -431,4 +440,46 @@ function get_finalgrade_by_scale($finalgrade, $scaleid) {
     }
 
     return $finalgrade;
+}
+
+/**
+ * Get the course context
+ *
+ * @param $courseid
+ * @return mixed
+ */
+
+function get_context_course($courseid) {
+    global $coursescontexts;
+
+    if (!is_null($coursescontexts) && array_key_exists($courseid, $coursescontexts)) {
+        return $coursescontexts[$courseid];
+    }
+
+    $coursescontexts[$courseid] = context_course::instance($courseid);
+
+    return $coursescontexts[$courseid];
+}
+
+/**
+ * Verify if the user is a student
+ *
+ * @param $context
+ * @param $userid
+ * @return bool
+ */
+function is_student($context, $userid) {
+    $userroles = get_user_roles($context, $userid);
+
+    $isstudent = false;
+    if (!empty($userroles)) {
+        foreach ($userroles as $r => $role) {
+            if ($role->roleid == 5) {
+                $isstudent = true;
+                break;
+            }
+        }
+    }
+
+    return $isstudent;
 }

@@ -71,16 +71,16 @@ $params['courseid'] = $COURSE->id;
 $order = "ORDER BY r.points DESC, u.firstname ASC
         LIMIT " . $perpage;
 
-if($group) {
+if ($group) {
     $from .= " INNER JOIN {groups_members} gm ON gm.userid = u.id AND gm.groupid = :groupid";
     $params['groupid'] = $group;
 }
 
 $students = array_values($DB->get_records_sql("SELECT $userfields, r.points $from $where $order", $params));
 
-$strcoursereport = "Nenhum estudante no ranking ainda";
-if(count($students)) {
-    $strcoursereport = "Detalhes do ranking: ". count($students) ." primeiros estudantes";
+$strcoursereport = get_string('nostudents', 'block_ranking');;
+if (count($students)) {
+    $strcoursereport = get_string('report_head', 'block_ranking', count($students));
 }
 
 echo $OUTPUT->header();
@@ -90,7 +90,7 @@ $PAGE->set_title($strcoursereport);
 // Output group selector if there are groups in the course.
 echo $OUTPUT->container_start('ranking-report');
 
-if(($course->groupmode == SEPARATEGROUPS and has_capability('moodle/site:accessallgroups', $context))) {
+if (($course->groupmode == SEPARATEGROUPS and has_capability('moodle/site:accessallgroups', $context))) {
     $groups = groups_get_all_groups($course->id);
     if (!empty($groups)) {
         groups_print_course_menu($course, $PAGE->url);

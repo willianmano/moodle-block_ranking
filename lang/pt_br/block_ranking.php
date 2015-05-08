@@ -35,6 +35,8 @@ $string['blocktitle'] = 'Título do bloco';
 $string['table_position'] = 'Pos';
 $string['table_name'] = 'Nome';
 $string['table_points'] = 'Pontos';
+$string['see_full_ranking'] = 'Ver ranking completo';
+$string['report_head'] = 'Detalhes do ranking: Primeiros {$a} estudantes';
 
 // Global configuration.
 $string['rankingsize'] = 'Tamanho do ranking';
