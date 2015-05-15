@@ -54,7 +54,7 @@ function block_ranking_get_students($limit = null) {
             FROM
                 {user} u
             INNER JOIN {role_assignments} a ON a.userid = u.id
-            INNER JOIN {ranking_points} r ON r.userid = u.id
+            INNER JOIN {ranking_points} r ON r.userid = u.id AND r.courseid = :r_courseid
             INNER JOIN {context} c ON c.id = a.contextid
             WHERE a.contextid = :contextid
             AND a.userid = u.id
@@ -67,6 +67,7 @@ function block_ranking_get_students($limit = null) {
     $params['roleid'] = 5;
     $params['courseid'] = $COURSE->id;
     $params['crsid'] = $COURSE->id;
+    $params['r_courseid'] = $COURSE->id;
 
     $users = array_values($DB->get_records_sql($sql, $params));
 
