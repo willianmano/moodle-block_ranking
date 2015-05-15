@@ -20,7 +20,8 @@ For example:
 
 >**This only occurs with activities that have grades. ex: foruns, assignments, lessons, etc...**
 
-**<i class="icon-refresh"></i> UPDATE NOTES:**
+Update Notes
+------------
 
 > - Now you don't need configure the course completion, only the activities completion criterias. Again, the plugin only monitors the activities with completion criteria.
 > - The table ranking_cmc_mirror was removed. 
