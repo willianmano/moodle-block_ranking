@@ -172,12 +172,10 @@ function block_ranking_print_students($rankinglastmonth, $rankinglastweek, $rank
  *
  * @return string
  */
-function block_ranking_print_individual_ranking()
-{
+function block_ranking_print_individual_ranking() {
     global $USER, $COURSE, $PAGE;
 
-
-    if(!is_student($PAGE->context, $USER->id)) {
+    if (!is_student($PAGE->context, $USER->id)) {
         return '';
     }
 
@@ -185,7 +183,7 @@ function block_ranking_print_individual_ranking()
     $lastweekpoints = block_ranking_get_student_points_by_date($USER->id, $weekstart, time());
     $lastweekpoints = $lastweekpoints->points != null ? $lastweekpoints->points : '0';
     $lastweekpoints = $lastweekpoints . " " . strtolower(get_string('table_points', 'block_ranking'));
-    
+
     $monthstart = strtotime(date('Y-m-01'));
     $lastmonthpoints = block_ranking_get_student_points_by_date($USER->id, $monthstart, time());
     $lastmonthpoints = $lastmonthpoints->points != null ? $lastmonthpoints->points : '0';
@@ -206,10 +204,10 @@ function block_ranking_print_individual_ranking()
     $row = new html_table_row();
     $row->cells = array($lastweekpoints, $lastmonthpoints, $totalpoints);
     $table->data[] = $row;
-    
-    $individual_ranking = html_writer::table($table);
 
-    return "<h4>".get_string('your_score', 'block_ranking').":</h4>" . $individual_ranking;
+    $individualranking = html_writer::table($table);
+
+    return "<h4>".get_string('your_score', 'block_ranking').":</h4>" . $individualranking;
 }
 
 /**
