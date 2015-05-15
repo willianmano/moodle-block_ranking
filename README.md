@@ -1,9 +1,16 @@
 Moodle Ranking block repository
 ===============================
 
+VERSION 2
+---------
+
 This block improves gamefication into the moodle plataform.
 
-The ranking block works together with the moodle course completion. In the moodle course you configure the criterias to the end of the course. The ranking block monitors these activities and add points to the students based on accomplishing the activities. There are different ways to gain points.
+This new version is more simpler and easy to use, but, with more visual resources.
+
+The ranking now, works with the activity completion, so you need to enable that and configure the criterias for all activities you want to monitor. The plugin only add points to activities with completion criterias. The method to add points remains the same.
+
+There are different ways to gain points.
 
 For example:
  * If a student completes a html page the ranking adds 2 points.
@@ -32,7 +39,7 @@ Post instalation
 ----------------
 After you have installed the block you just add it into the moodle course.
 
-> The ranking block works together with the moodle course completion. In the moodle course you configure the criterias to the end of the course. The ranking block monitors these activities and add points to the students based on accomplishing the activities.
+> The ranking block works together with the activity completion, so you need to enable that and configure the criterias for all activities you want to monitor. The ranking block monitors these activities and add points to the students based on accomplishing the activities.
 
 
 **OBS:** The ranking block needs the moodle cron configured and working fine. Read the moodle documentation about the cron file (for more information..)
