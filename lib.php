@@ -33,7 +33,8 @@ $coursescontexts = array();
 /**
  * Return the list of students in the course ranking
  *
- * @return array
+ * @param int
+ * @return mixed
  */
 function block_ranking_get_students($limit = null) {
     global $COURSE, $DB, $PAGE;
@@ -78,6 +79,14 @@ function block_ranking_get_students($limit = null) {
     return $users;
 }
 
+/**
+ * Get the students points based on a time interval
+ *
+ * @param int
+ * @param int
+ * @param int
+ * @return mixed
+ */
 function block_ranking_get_students_by_date($limit = null, $datestart, $dateend) {
     global $COURSE, $DB, $PAGE;
 
@@ -158,6 +167,112 @@ function block_ranking_print_students($rankinglastmonth, $rankinglastweek, $rank
             </div>';
 }
 
+/**
+ * Print the student individual ranking points
+ *
+ * @return string
+ */
+function block_ranking_print_individual_ranking()
+{
+    global $USER, $COURSE, $PAGE;
+
+
+    if(!is_student($PAGE->context, $USER->id)) {
+        return '';
+    }
+
+    $weekstart = strtotime(date('d-m-Y', strtotime('-'.date('w').' days')));
+    $lastweekpoints = block_ranking_get_student_points_by_date($USER->id, $weekstart, time());
+    $lastweekpoints = $lastweekpoints->points != null ? $lastweekpoints->points : '0';
+    $lastweekpoints = $lastweekpoints . " " . strtolower(get_string('table_points', 'block_ranking'));
+    
+    $monthstart = strtotime(date('Y-m-01'));
+    $lastmonthpoints = block_ranking_get_student_points_by_date($USER->id, $monthstart, time());
+    $lastmonthpoints = $lastmonthpoints->points != null ? $lastmonthpoints->points : '0';
+    $lastmonthpoints = $lastmonthpoints . " " . strtolower(get_string('table_points', 'block_ranking'));
+
+    $totalpoints = block_ranking_get_student_points($USER->id);
+    $totalpoints = $totalpoints->points != null ? $totalpoints->points : '0';
+    $totalpoints = $totalpoints . " " . strtolower(get_string('table_points', 'block_ranking'));
+
+    $table = new html_table();
+    $table->attributes = array("class" => "rankingTable table table-striped generaltable");
+    $table->head = array(
+                        get_string('weekly', 'block_ranking'),
+                        get_string('monthly', 'block_ranking'),
+                        get_string('general', 'block_ranking')
+                    );
+
+    $row = new html_table_row();
+    $row->cells = array($lastweekpoints, $lastmonthpoints, $totalpoints);
+    $table->data[] = $row;
+    
+    $individual_ranking = html_writer::table($table);
+
+    return "<h4>".get_string('your_score', 'block_ranking').":</h4>" . $individual_ranking;
+}
+
+/**
+ * Get the student points
+ *
+ * @param int
+ * @return mixed
+ */
+function block_ranking_get_student_points($userid) {
+    global $COURSE, $DB;
+
+    $sql = "SELECT
+                sum(rl.points) as points
+            FROM
+                {user} u
+            INNER JOIN {ranking_points} r ON r.userid = u.id AND r.courseid = :courseid
+            INNER JOIN {ranking_logs} rl ON rl.rankingid = r.id
+            WHERE u.id = :userid
+            AND r.courseid = :crsid";
+
+    $params['userid'] = $userid;
+    $params['courseid'] = $COURSE->id;
+    $params['crsid'] = $COURSE->id;
+
+    return $DB->get_record_sql($sql, $params);
+}
+
+/**
+ * Get the student points based on a time interval
+ *
+ * @param int
+ * @param int
+ * @param int
+ * @return mixed
+ */
+function block_ranking_get_student_points_by_date($userid, $datestart, $dateend) {
+    global $COURSE, $DB;
+
+    $sql = "SELECT
+                sum(rl.points) as points
+            FROM
+                {user} u
+            INNER JOIN {ranking_points} r ON r.userid = u.id AND r.courseid = :courseid
+            INNER JOIN {ranking_logs} rl ON rl.rankingid = r.id
+            WHERE u.id = :userid
+            AND r.courseid = :crsid
+            AND rl.timecreated BETWEEN :weekstart AND :weekend";
+
+    $params['userid'] = $userid;
+    $params['courseid'] = $COURSE->id;
+    $params['crsid'] = $COURSE->id;
+    $params['weekstart'] = $datestart;
+    $params['weekend'] = $dateend;
+
+    return $DB->get_record_sql($sql, $params);
+}
+
+/**
+ * Return a table of ranking based on data passed
+ *
+ * @param mixed
+ * @return mixed
+ */
 function generate_table($data) {
     global $USER, $OUTPUT;
 
@@ -201,7 +316,8 @@ function generate_table($data) {
 /**
  * Returns the modules completions
  *
- * @return array
+ * @param int
+ * @return mixed
  */
 function get_modules_completion($lastcomputedid) {
     global $DB;
@@ -238,7 +354,7 @@ function get_modules_completion($lastcomputedid) {
 /**
  * Function executed by cron to calculate the student points
  *
- * @return bool
+ * @return void
  */
 function block_ranking_calculate_points() {
     global $DB;
@@ -278,7 +394,7 @@ function block_ranking_calculate_points() {
 /**
  * Add points to users
  *
- * @return bool
+ * @return void
  */
 function add_point_to_user($usercompletion) {
     // Get block ranking configuration.
@@ -314,7 +430,7 @@ function add_point_to_user($usercompletion) {
 /**
  * Default method to add points to students
  *
- * @return bool
+ * @return void
  */
 function add_default_points($usercompletion, $points) {
     if (!isset($points) || trim($points) != '') {
@@ -332,6 +448,9 @@ function add_default_points($usercompletion, $points) {
 /**
  * Save students points
  *
+ * @param int
+ * @param int
+ * @param int
  * @return int
  */
 function add_or_update_user_points($userid, $courseid, $points) {
@@ -367,6 +486,10 @@ function add_or_update_user_points($userid, $courseid, $points) {
 /**
  * Add points movement to log
  *
+ * @param int
+ * @param int
+ * @param int
+ * @param int
  * @return int
  */
 function add_ranking_log($rankingid, $courseid, $cmc, $points) {
@@ -384,12 +507,13 @@ function add_ranking_log($rankingid, $courseid, $cmc, $points) {
     return $logid;
 }
 
-// GET GRADES.
-
 /**
  * Returns activity grade
  *
- * @return int
+ * @param int
+ * @param int
+ * @param int
+ * @return float
  */
 function get_activity_finalgrade($activity, $activityid, $userid) {
     global $DB;
@@ -424,6 +548,8 @@ function get_activity_finalgrade($activity, $activityid, $userid) {
 /**
  * Returns activity grade by scale
  *
+ * @param int
+ * @param int
  * @return int
  */
 function get_finalgrade_by_scale($finalgrade, $scaleid) {
@@ -447,7 +573,7 @@ function get_finalgrade_by_scale($finalgrade, $scaleid) {
 /**
  * Get the course context
  *
- * @param $courseid
+ * @param int
  * @return mixed
  */
 
@@ -466,8 +592,8 @@ function get_context_course($courseid) {
 /**
  * Verify if the user is a student
  *
- * @param $context
- * @param $userid
+ * @param int
+ * @param int
  * @return bool
  */
 function is_student($context, $userid) {

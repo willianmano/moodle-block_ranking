@@ -86,7 +86,11 @@ class block_ranking extends block_base {
 
         $rankinggeral = block_ranking_get_students($rankingsize);
 
-        $this->content->text = block_ranking_print_students($rankinglastmonth, $rankinglastweek, $rankinggeral);
+        $rankingstables = block_ranking_print_students($rankinglastmonth, $rankinglastweek, $rankinggeral);
+
+        $individualranking = block_ranking_print_individual_ranking();
+
+        $this->content->text = $rankingstables . $individualranking;
 
         $this->content->footer .= html_writer::tag('p',
                                         html_writer::link(

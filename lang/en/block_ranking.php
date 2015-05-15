@@ -35,6 +35,7 @@ $string['blocktitle'] = 'Block Title';
 $string['table_position'] = 'Pos';
 $string['table_name'] = 'Fullname';
 $string['table_points'] = 'Points';
+$string['your_score'] = 'Your score';
 $string['see_full_ranking'] = 'See full ranking';
 $string['report_head'] = 'Ranking details: First {$a} students';
 
