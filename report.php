@@ -56,7 +56,7 @@ $PAGE->set_url($url);
 $userfields = user_picture::fields('u', array('username'));
 $from = "FROM {user} u
         INNER JOIN {role_assignments} a ON a.userid = u.id
-        LEFT JOIN {ranking_points} r ON r.userid = u.id
+        LEFT JOIN {ranking_points} r ON r.userid = u.id AND r.courseid = :r_courseid
         INNER JOIN {context} c ON c.id = a.contextid";
 
 $where = "WHERE a.contextid = :contextid
@@ -67,6 +67,7 @@ $where = "WHERE a.contextid = :contextid
 $params['contextid'] = $context->id;
 $params['roleid'] = 5;
 $params['courseid'] = $COURSE->id;
+$params['r_courseid'] = $params['courseid'];
 
 $order = "ORDER BY r.points DESC, u.firstname ASC
         LIMIT " . $perpage;
@@ -76,7 +77,9 @@ if ($group) {
     $params['groupid'] = $group;
 }
 
-$students = array_values($DB->get_records_sql("SELECT $userfields, r.points $from $where $order", $params));
+$sql = "SELECT $userfields, r.points $from $where $order";
+
+$students = array_values($DB->get_records_sql($sql, $params));
 
 $strcoursereport = get_string('nostudents', 'block_ranking');;
 if (count($students)) {
@@ -97,7 +100,8 @@ if (($course->groupmode == SEPARATEGROUPS and has_capability('moodle/site:access
     }
 }
 
-echo generateTable($students);
+echo generate_table($students);
+
 echo $OUTPUT->container_end();
 
 echo $OUTPUT->footer();

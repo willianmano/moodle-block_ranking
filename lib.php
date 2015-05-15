@@ -58,7 +58,7 @@ function block_ranking_get_students($limit = null) {
             FROM
                 {user} u
             INNER JOIN {role_assignments} a ON a.userid = u.id
-            INNER JOIN {ranking_points} r ON r.userid = u.id
+            INNER JOIN {ranking_points} r ON r.userid = u.id AND r.courseid = :r_courseid
             INNER JOIN {context} c ON c.id = a.contextid
             WHERE a.contextid = :contextid
             AND a.userid = u.id
@@ -71,6 +71,7 @@ function block_ranking_get_students($limit = null) {
     $params['roleid'] = 5;
     $params['courseid'] = $COURSE->id;
     $params['crsid'] = $COURSE->id;
+    $params['r_courseid'] = $COURSE->id;
 
     $users = array_values($DB->get_records_sql($sql, $params));
 
@@ -101,7 +102,7 @@ function block_ranking_get_students_by_date($limit = null, $datestart, $dateend)
             FROM
                 {user} u
             INNER JOIN {role_assignments} a ON a.userid = u.id
-            INNER JOIN {ranking_points} r ON r.userid = u.id
+            INNER JOIN {ranking_points} r ON r.userid = u.id AND r.courseid = :r_courseid
             INNER JOIN {ranking_logs} rl ON rl.rankingid = r.id
             INNER JOIN {context} c ON c.id = a.contextid
             WHERE a.contextid = :contextid
@@ -117,6 +118,7 @@ function block_ranking_get_students_by_date($limit = null, $datestart, $dateend)
     $params['contextid'] = $context->id;
     $params['roleid'] = 5;
     $params['courseid'] = $COURSE->id;
+    $params['r_courseid'] = $COURSE->id;
     $params['crsid'] = $COURSE->id;
     $params['weekstart'] = $datestart;
     $params['weekend'] = $dateend;

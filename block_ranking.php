@@ -78,11 +78,11 @@ class block_ranking extends block_base {
 
         $rankingsize = isset($this->config->ranking_rankingsize) ? trim($this->config->ranking_rankingsize) : 0;
 
-        $monthstart = strtotime(date('Y-m-01'));
-        $rankinglastmonth = block_ranking_get_students_by_date($rankingsize, $monthstart, time());
-
         $weekstart = strtotime(date('d-m-Y', strtotime('-'.date('w').' days')));
         $rankinglastweek = block_ranking_get_students_by_date($rankingsize, $weekstart, time());
+        
+        $monthstart = strtotime(date('Y-m-01'));
+        $rankinglastmonth = block_ranking_get_students_by_date($rankingsize, $monthstart, time());
 
         $rankinggeral = block_ranking_get_students($rankingsize);
 
