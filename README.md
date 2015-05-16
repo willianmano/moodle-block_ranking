@@ -8,7 +8,7 @@ This block improves gamefication into the moodle plataform.
 
 This new version is more simpler and easy to use, but, with more visual resources.
 
-The ranking works with the activity completion, so you need to enable that and configure the criterias for all activities you want to monitor. The plugin only add points to activities with completion criterias. The method to add points remains the same.
+The ranking works with the activity completion tracking, so you need to enable that and configure the criterias for all activities you want to monitor. The plugin only add points to activities with completion criterias. The method to add points remains the same.
 
 There are different ways to gain points.
 
@@ -23,8 +23,12 @@ For example:
 Update Notes
 ------------
 
-> - Now you don't need configure the course completion, only the activities completion criterias. Again, the plugin only monitors the activities with completion criteria.
-> - The table ranking_cmc_mirror was removed. 
+> - Added a weekly ranking
+> - Added a monthly ranking
+> - Added a tiny report with top 100 students in general ranking
+> - Added filter the tiny report by groups (the course group mode needs to be "separeted groups" or "visible groups")
+> - Now you don't need configure the course completion tracking, only the activities completion criterias. Again, the plugin only monitors the activities with completion criteria
+> - The table ranking_cmc_mirror was removed.
 
 Installation
 ------------
@@ -47,5 +51,12 @@ After you have installed the block you just add it into the moodle course.
 
 > The ranking block works together with the activity completion, so you need to enable that and configure the criterias for all activities you want to monitor. The ranking block monitors these activities and add points to the students based on accomplishing the activities.
 
+Enabling completion tracking
+-----------------------------------
+>- Go to: Site administration / Advanced features
+>- Turn on the item "**Enable completion tracking**"
+>- Inside the course go to: Course administration / Edit settings
+>- In the section Completion tracking set "**Completion tracking**" to yes
+>- Save
 
 **OBS:** The ranking block needs the moodle cron configured and working fine. Read the moodle documentation about the cron file (for more information..)

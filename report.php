@@ -50,6 +50,7 @@ if ($action) {
 // Page info.
 $PAGE->set_context($context);
 $PAGE->set_pagelayout('course');
+$PAGE->set_title($course->fullname.': Ranking geral dos alunos');
 $PAGE->set_heading($COURSE->fullname);
 $PAGE->set_url($url);
 
@@ -93,7 +94,7 @@ $PAGE->set_title($strcoursereport);
 // Output group selector if there are groups in the course.
 echo $OUTPUT->container_start('ranking-report');
 
-if (($course->groupmode == SEPARATEGROUPS and has_capability('moodle/site:accessallgroups', $context))) {
+if (has_capability('moodle/site:accessallgroups', $context)) {
     $groups = groups_get_all_groups($course->id);
     if (!empty($groups)) {
         groups_print_course_menu($course, $PAGE->url);

@@ -120,7 +120,7 @@ function block_ranking_get_students_by_date($limit = null, $datestart, $dateend)
             AND c.instanceid = :courseid
             AND r.courseid = :crsid
             AND rl.timecreated BETWEEN :weekstart AND :weekend
-            GROUP BY rankingid
+            GROUP BY u.id
             ORDER BY points DESC, u.firstname ASC
             LIMIT " . $limit;
 
@@ -534,7 +534,11 @@ function get_activity_finalgrade($activity, $activityid, $userid) {
 
         // Grade without scale -- grademax 100.
         if (empty($gradeitem->scaleid)) {
-            $finalgrade = $gradeitem->finalgrade / 10;
+            $finalgrade = $gradeitem->finalgrade;
+
+            if ($finalgrade > 10) {
+                $finalgrade = $finalgrade / 10;
+            }
         } else {
             $finalgrade = get_finalgrade_by_scale($gradeitem->finalgrade, $gradeitem->scaleid);
         }
