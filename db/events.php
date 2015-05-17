@@ -16,7 +16,7 @@
 
 
 /**
- * Ranking block install
+ * Ranking block - report page
  *
  * @package    contrib
  * @subpackage block_ranking
@@ -25,23 +25,12 @@
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
-/**
- * @return bool
- */
-function xmldb_block_ranking_install() {
-    global $DB;
+defined('MOODLE_INTERNAL') || die();
 
-    $criteria = array(
-        'plugin' => 'block_ranking',
-        'name' => 'lastcomputedid'
-    );
-
-    if (!$DB->record_exists('config_plugins', $criteria)) {
-        $criteria['value'] = 0;
-        $DB->insert_record('config_plugins', $criteria, true);
-    }
-
-    return true;
-}
-
-
+$observers = array(
+    array(
+        'eventname' => '\core\event\course_module_completion_updated',
+        'callback' => 'block_ranking_helper::observer',
+        'internal' => false
+    )
+);

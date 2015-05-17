@@ -108,18 +108,6 @@ class block_ranking extends block_base {
     }
 
     /**
-     * Executes the cron job
-     *
-     * @return bool
-     */
-    public function cron() {
-
-        block_ranking_calculate_points();
-
-        return true;
-    }
-
-    /**
      * Allow block instance configuration
      *
      * @return bool
