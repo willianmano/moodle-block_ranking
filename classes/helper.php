@@ -95,7 +95,7 @@ class block_ranking_helper {
 
         $cmc = $DB->get_record('course_modules_completion', array('coursemoduleid' => $coursemoduleid, 'userid' => $userid), '*');
 
-        if($cmc->id) {
+        if($cmc->id && $cmc->completionstate != 0) {
             return $cmc->id;
         }
 
