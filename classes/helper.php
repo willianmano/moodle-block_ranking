@@ -44,15 +44,60 @@ class block_ranking_helper {
      */
     public static function observer(\core\event\base $event) {
 
+        if (!self::is_student($event->relateduserid)) {
+            return;
+        }
+
+        if ($event->eventname == '\mod_quiz\event\attempt_submitted') {
+            $objectid = self::get_coursemodule_instance($event->contextinstanceid, $event->relateduserid);
+
+            if ($objectid) {
+                block_ranking_manager::add_user_points($objectid);    
+            }
+
+            return;
+        }
+
         if (!self::is_completion_completed($event->objectid)) {
             return;
         }
 
-        if (self::is_completion_repeated($event->courseid, $event->userid, $event->objectid)) {
+        if (self::is_completion_repeated($event->courseid, $event->relateduserid, $event->objectid)) {
             return;
         }
 
         block_ranking_manager::add_user_points($event->objectid);
+    }
+
+    /**
+     * Verify if the user is a student
+     *
+     * @param int $userid
+     *
+     * @return boolean
+     */
+    protected static function is_student($userid) {
+        return user_has_role_assignment($userid, 5);
+    }
+
+    /**
+     * Get the course completion instance
+     *
+     * @param int $coursemoduleid
+     * @param int $userid
+     *
+     * @return mixed
+     */
+    protected static function get_coursemodule_instance($coursemoduleid, $userid) {
+        global $DB;
+
+        $cmc = $DB->get_record('course_modules_completion', array('coursemoduleid' => $coursemoduleid, 'userid' => $userid), '*');
+
+        if($cmc->id) {
+            return $cmc->id;
+        }
+
+        return false;
     }
 
     /**
@@ -96,5 +141,4 @@ class block_ranking_helper {
 
         return $DB->get_record_sql($sql, $params);
     }
-
 }

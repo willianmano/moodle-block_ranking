@@ -32,5 +32,10 @@ $observers = array(
         'eventname' => '\core\event\course_module_completion_updated',
         'callback' => 'block_ranking_helper::observer',
         'internal' => false
-    )
+    ),
+    array(
+        'eventname' => '\mod_quiz\event\attempt_submitted',
+        'callback' => 'block_ranking_helper::observer',
+        'internal' => false
+    ),
 );

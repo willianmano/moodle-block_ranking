@@ -44,10 +44,6 @@ class block_ranking_manager {
 
         $usercompletion = self::get_module_completion($cmcid);
 
-        if (!self::is_student($usercompletion->userid)) {
-            return;
-        }
-
         switch ($usercompletion->modulename) {
             case 'assign':
                 self::add_default_points($usercompletion, self::get_config('assignpoints'));
@@ -101,9 +97,7 @@ class block_ranking_manager {
                     {course_modules_completion} cmc
                 INNER JOIN {course_modules} cm ON cm.id = cmc.coursemoduleid
                 INNER JOIN {modules} m ON m.id = cm.module
-                WHERE
-                    cmc.completionstate = 1
-                    AND cmc.id = :cmcid";
+                WHERE cmc.id = :cmcid";
 
         $params['cmcid'] = $cmcid;
 
@@ -116,11 +110,12 @@ class block_ranking_manager {
      * @return void
      */
     protected static function add_default_points($completion, $points = null) {
+
         if (!isset($points) || trim($points) != '') {
             $points = self::DEFAULT_POINTS;
         }
 
-        if (!is_null($completion->completiongradeitemnumber)) {
+        if (!empty($completion->completiongradeitemnumber)) {
             $activitygrade = self::get_activity_finalgrade($completion->modulename, $completion->instance, $completion->userid);
             $points += $activitygrade;
         }
@@ -128,19 +123,6 @@ class block_ranking_manager {
         $rankingid = self::add_or_update_user_points($completion->userid, $completion->course, $points);
 
         self::add_ranking_log($rankingid, $completion->course, $completion->id, $points);
-
-        $params = array(
-            'courseid' => $completion->course,
-            'userid' => $completion->userid,
-            'points' => $points,
-            'rankingid' => $rankingid,
-            'modulename' => $completion->modulename,
-            'moduleinstance' => $completion->instance
-        );
-
-        $event = \block_xp\event\user_point_added::create($params);
-
-        $event->trigger();
     }
 
     /**
@@ -294,16 +276,5 @@ class block_ranking_manager {
         }
 
         return '';
-    }
-
-    /**
-     * Verify if the user is a student
-     *
-     * @param \core\event\base $event
-     *
-     * @return boolean
-     */
-    protected static function is_student($userid) {
-        return user_has_role_assignment($userid, 5);
     }
 }
