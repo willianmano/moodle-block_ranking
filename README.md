@@ -6,7 +6,9 @@ VERSION 2
 
 This block improves gamefication into the moodle plataform.
 
-This new version is more simpler and easy to use, but, with more visual resources.
+This new version is more simpler and easy to use, but, with more visual.
+
+The plugin works listening moodle events, so now, the points are added in real time.
 
 The ranking works with the activity completion tracking, so you need to enable that and configure the criterias for all activities you want to monitor. The plugin only add points to activities with completion criterias. The method to add points remains the same.
 
@@ -23,6 +25,8 @@ For example:
 Update Notes
 ------------
 
+> - Added event listeners to add point
+> - Removed cron dependency
 > - Added a weekly ranking
 > - Added a monthly ranking
 > - Added a tiny report with top 100 students in general ranking
