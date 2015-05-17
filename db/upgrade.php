@@ -52,7 +52,7 @@ function xmldb_block_ranking_upgrade($oldversion, $block) {
             'name' => 'lastcomputedid'
         );
 
-        $DB->delete_records('config_plugins', $criteria); 
+        $DB->delete_records('config_plugins', $criteria);
     }
 
     return true;

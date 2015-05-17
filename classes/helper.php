@@ -95,7 +95,7 @@ class block_ranking_helper {
 
         $cmc = $DB->get_record('course_modules_completion', array('coursemoduleid' => $coursemoduleid, 'userid' => $userid), '*');
 
-        if($cmc->id && $cmc->completionstate != 0) {
+        if ($cmc->id && $cmc->completionstate != 0) {
             return $cmc->id;
         }
 
@@ -109,13 +109,12 @@ class block_ranking_helper {
      *
      * @return mixed
      */
-    protected static function get_quiz_grade($id)
-    {
+    protected static function get_quiz_grade($id) {
         global $DB;
 
         $grade = $DB->get_record('quiz_attempts', array('id' => $id), '*');
 
-        return $grade->sumgrades; 
+        return $grade->sumgrades;
     }
 
     /**

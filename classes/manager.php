@@ -125,8 +125,9 @@ class block_ranking_manager {
         if (!empty($completion->completiongradeitemnumber)) {
             $activitygrade = self::get_activity_finalgrade($completion->modulename, $completion->instance, $completion->userid);
             $points += $activitygrade;
-        } else if(!empty($grade)) {
-            if($grade > 10) {
+        } else if (!empty($grade)) {
+
+            if ($grade > 10) {
                 $grade = $grade / 10;
             }
 
