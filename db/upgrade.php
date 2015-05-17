@@ -36,17 +36,6 @@ function xmldb_block_ranking_upgrade($oldversion, $block) {
     global $DB;
 
     if ($oldversion < 2015030300) {
-
-        $criteria = array(
-            'plugin' => 'block_ranking',
-            'name' => 'lastcomputedid'
-        );
-
-        if (!$DB->record_exists('config_plugins', $criteria)) {
-            $criteria['value'] = 0;
-            $DB->insert_record('config_plugins', $criteria, true);
-        }
-
         // Drop the mirror table.
         $dbman = $DB->get_manager();
 
@@ -55,6 +44,15 @@ function xmldb_block_ranking_upgrade($oldversion, $block) {
         if ($dbman->table_exists($table)) {
             $dbman->drop_table($table);
         }
+    }
+
+    if ($oldversion > 2015030300 && $oldversion < 2015051700) {
+        $criteria = array(
+            'plugin' => 'block_ranking',
+            'name' => 'lastcomputedid'
+        );
+
+        $DB->delete_records('config_plugins', $criteria); 
     }
 
     return true;

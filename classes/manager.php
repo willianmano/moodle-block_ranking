@@ -115,19 +115,32 @@ class block_ranking_manager {
      *
      * @return void
      */
-    protected static function add_default_points($usercompletion, $points = null) {
+    protected static function add_default_points($completion, $points = null) {
         if (!isset($points) || trim($points) != '') {
             $points = self::DEFAULT_POINTS;
         }
 
-        if (!is_null($usercompletion->completiongradeitemnumber)) {
-            $activitygrade = self::get_activity_finalgrade($usercompletion->modulename, $usercompletion->instance, $usercompletion->userid);
+        if (!is_null($completion->completiongradeitemnumber)) {
+            $activitygrade = self::get_activity_finalgrade($completion->modulename, $completion->instance, $completion->userid);
             $points += $activitygrade;
         }
 
-        $rankingid = self::add_or_update_user_points($usercompletion->userid, $usercompletion->course, $points);
+        $rankingid = self::add_or_update_user_points($completion->userid, $completion->course, $points);
 
-        self::add_ranking_log($rankingid, $usercompletion->course, $usercompletion->id, $points);
+        self::add_ranking_log($rankingid, $completion->course, $completion->id, $points);
+
+        $params = array(
+            'courseid' => $completion->course,
+            'userid' => $completion->userid,
+            'points' => $points,
+            'rankingid' => $rankingid,
+            'modulename' => $completion->modulename,
+            'moduleinstance' => $completion->instance
+        );
+
+        $event = \block_xp\event\user_point_added::create($params);
+
+        $event->trigger();
     }
 
     /**
