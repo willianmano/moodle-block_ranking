@@ -40,33 +40,40 @@ class block_ranking_manager {
 
     protected static $config = null;
 
-    public static function add_user_points($cmcid) {
+    /**
+     *
+     * @param int $cmcid
+     * @param float $grade
+     *
+     * @return void
+     */
+    public static function add_user_points($cmcid, $grade) {
 
         $usercompletion = self::get_module_completion($cmcid);
 
         switch ($usercompletion->modulename) {
             case 'assign':
-                self::add_default_points($usercompletion, self::get_config('assignpoints'));
+                self::add_default_points($usercompletion, self::get_config('assignpoints'), $grade);
             break;
 
             case 'resource':
-                self::add_default_points($usercompletion, self::get_config('resourcepoints'));
+                self::add_default_points($usercompletion, self::get_config('resourcepoints'), $grade);
             break;
 
             case 'forum':
-                self::add_default_points($usercompletion, self::get_config('forumpoints'));
+                self::add_default_points($usercompletion, self::get_config('forumpoints'), $grade);
             break;
 
             case 'workshop':
-                self::add_default_points($usercompletion, self::get_config('workshoppoints'));
+                self::add_default_points($usercompletion, self::get_config('workshoppoints'), $grade);
             break;
 
             case 'page':
-                self::add_default_points($usercompletion, self::get_config('pagepoints'));
+                self::add_default_points($usercompletion, self::get_config('pagepoints'), $grade);
             break;
 
             default:
-                self::add_default_points($usercompletion, self::get_config('defaultpoints'));
+                self::add_default_points($usercompletion, self::get_config('defaultpoints'), $grade);
             break;
         }
     }
@@ -109,7 +116,7 @@ class block_ranking_manager {
      *
      * @return void
      */
-    protected static function add_default_points($completion, $points = null) {
+    protected static function add_default_points($completion, $points = null, $grade) {
 
         if (!isset($points) || trim($points) != '') {
             $points = self::DEFAULT_POINTS;
@@ -118,6 +125,12 @@ class block_ranking_manager {
         if (!empty($completion->completiongradeitemnumber)) {
             $activitygrade = self::get_activity_finalgrade($completion->modulename, $completion->instance, $completion->userid);
             $points += $activitygrade;
+        } else if(!empty($grade)) {
+            if($grade > 10) {
+                $grade = $grade / 10;
+            }
+
+            $points += $grade;
         }
 
         $rankingid = self::add_or_update_user_points($completion->userid, $completion->course, $points);

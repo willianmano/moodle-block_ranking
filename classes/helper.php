@@ -52,7 +52,9 @@ class block_ranking_helper {
             $objectid = self::get_coursemodule_instance($event->contextinstanceid, $event->relateduserid);
 
             if ($objectid) {
-                block_ranking_manager::add_user_points($objectid);    
+                $grade = self::get_quiz_grade($event->objectid);
+
+                block_ranking_manager::add_user_points($objectid, $grade);
             }
 
             return;
@@ -98,6 +100,22 @@ class block_ranking_helper {
         }
 
         return false;
+    }
+
+    /**
+     * Get the quiz attempt grade
+     *
+     * @param int $id
+     *
+     * @return mixed
+     */
+    protected static function get_quiz_grade($id)
+    {
+        global $DB;
+
+        $grade = $DB->get_record('quiz_attempts', array('id' => $id), '*');
+
+        return $grade->sumgrades; 
     }
 
     /**
