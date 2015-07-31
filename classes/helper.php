@@ -43,12 +43,24 @@ class block_ranking_helper {
      * @return void
      */
     public static function observer(\core\event\base $event) {
+        global $DB;
+
 
         if (!self::is_student($event->relateduserid)) {
             return;
         }
 
         if ($event->eventname == '\mod_quiz\event\attempt_submitted') {
+
+            $enablemultipleattempts = $DB->get_record('config_plugins', array('plugin' => 'block_ranking', 'name' => 'enable_multiple_quizz_attempts'));
+            $isrepeated = self::is_completion_repeated($event->courseid, $event->relateduserid, $event->objectid);
+            
+            if ($enablemultipleattempts) {
+                if ($enablemultipleattempts->value == 0 && $isrepeated) {
+                    return;
+                }
+            }
+
             $objectid = self::get_coursemodule_instance($event->contextinstanceid, $event->relateduserid);
 
             if ($objectid) {

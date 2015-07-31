@@ -55,3 +55,9 @@ $string['defaultpoints'] = 'Default points';
 $string['monthly'] = 'Monthly';
 $string['weekly'] = 'Weekly';
 $string['general'] = 'General';
+
+$string['yes'] = 'Yes';
+$string['no'] = 'No';
+
+$string['enable_multiple_quizz_attempts'] = 'Enable multiple quizz attempts';
+$string['enable_multiple_quizz_attempts_help'] = 'Enable studens to add points in every quizz attempt. If this options is marked as NO, the student only will receive the points of the first attempt.';
