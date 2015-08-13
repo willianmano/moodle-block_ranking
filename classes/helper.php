@@ -43,12 +43,25 @@ class block_ranking_helper {
      * @return void
      */
     public static function observer(\core\event\base $event) {
+        global $DB;
+
 
         if (!self::is_student($event->relateduserid)) {
             return;
         }
 
         if ($event->eventname == '\mod_quiz\event\attempt_submitted') {
+
+            $enablemultipleattempts = $DB->get_record('config_plugins', array('plugin' => 'block_ranking', 'name' => 'enable_multiple_quizz_attempts'));
+
+            if (isset($enablemultipleattempts) && $enablemultipleattempts->value == 0) {
+                $isrepeated = self::is_completion_repeated($event->courseid, $event->relateduserid, $event->contextinstanceid);
+                
+                if ($isrepeated) {
+                    return;
+                }
+            }
+
             $objectid = self::get_coursemodule_instance($event->contextinstanceid, $event->relateduserid);
 
             if ($objectid) {
@@ -64,7 +77,7 @@ class block_ranking_helper {
             return;
         }
 
-        if (self::is_completion_repeated($event->courseid, $event->relateduserid, $event->objectid)) {
+        if (self::is_completion_repeated($event->courseid, $event->relateduserid, $event->contextinstanceid)) {
             return;
         }
 
@@ -145,7 +158,7 @@ class block_ranking_helper {
         global $DB;
 
         $sql = "SELECT
-                 *
+                 count(*) as qtd
                 FROM {ranking_points} p
                 INNER JOIN {ranking_logs} l ON l.rankingid = p.id
                 WHERE p.courseid = :courseid
@@ -156,6 +169,8 @@ class block_ranking_helper {
         $params['userid'] = $userid;
         $params['cmcid'] = $cmcid;
 
-        return $DB->get_record_sql($sql, $params);
+        $qtd = $DB->get_record_sql($sql, $params);
+
+        return (int) $qtd->qtd;
     }
 }

@@ -47,7 +47,7 @@ class block_ranking_manager {
      *
      * @return void
      */
-    public static function add_user_points($cmcid, $grade) {
+    public static function add_user_points($cmcid, $grade = null) {
 
         $usercompletion = self::get_module_completion($cmcid);
 
@@ -116,27 +116,29 @@ class block_ranking_manager {
      *
      * @return void
      */
-    protected static function add_default_points($completion, $points = null, $grade) {
+    protected static function add_default_points($completion, $points = null, $grade = null) {
 
         if (!isset($points) || trim($points) != '') {
             $points = self::DEFAULT_POINTS;
         }
 
-        if (!empty($completion->completiongradeitemnumber)) {
-            $activitygrade = self::get_activity_finalgrade($completion->modulename, $completion->instance, $completion->userid);
-            $points += $activitygrade;
-        } else if (!empty($grade)) {
-
+        if (!empty($grade)) {
             if ($grade > 10) {
                 $grade = $grade / 10;
             }
 
             $points += $grade;
+        } else {
+            $activitygrade = self::get_activity_finalgrade($completion->modulename, $completion->instance, $completion->userid);
+
+            if ($activitygrade) {
+                $points += $activitygrade;
+            }
         }
 
         $rankingid = self::add_or_update_user_points($completion->userid, $completion->course, $points);
 
-        self::add_ranking_log($rankingid, $completion->course, $completion->id, $points);
+        self::add_ranking_log($rankingid, $completion->course, $completion->coursemoduleid, $points);
     }
 
     /**

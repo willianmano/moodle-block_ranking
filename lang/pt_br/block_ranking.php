@@ -55,3 +55,9 @@ $string['defaultpoints'] = 'Pontuação padrão';
 $string['monthly'] = 'Mensal';
 $string['weekly'] = 'Semanal';
 $string['general'] = 'Geral';
+
+$string['yes'] = 'Sim';
+$string['no'] = 'Não';
+
+$string['enable_multiple_quizz_attempts'] = 'Habilitar mútiplas tentativas no quizz';
+$string['enable_multiple_quizz_attempts_help'] = 'Possibilita que os estudantes ganhem pontos em todas as tentativa no quizz. Se essa opção for marcada como não, o estudante só receberá os pontos da primeira tentativa.';
