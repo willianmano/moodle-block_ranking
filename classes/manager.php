@@ -138,7 +138,7 @@ class block_ranking_manager {
 
         $rankingid = self::add_or_update_user_points($completion->userid, $completion->course, $points);
 
-        self::add_ranking_log($rankingid, $completion->course, $completion->id, $points);
+        self::add_ranking_log($rankingid, $completion->course, $completion->coursemoduleid, $points);
     }
 
     /**
