@@ -214,7 +214,7 @@ class blocks_ranking_external extends external_api {
                             //'picture' => new external_value(PARAM_RAW, 'picture', VALUE_DEFAULT, null),
                             'picture' => new external_value(PARAM_TEXT,'picture url'),
                             'name' => new external_value(PARAM_RAW, 'name'),
-                            'points' => new external_value(PARAM_INT, 'points'),                                                                                   
+                            'points' => new external_value(PARAM_FLOAT, 'points'),                                                                                   
 						)
 					)
 				),
