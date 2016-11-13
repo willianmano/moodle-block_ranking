@@ -56,7 +56,7 @@ class block_ranking_helper {
 
             if (isset($enablemultipleattempts) && $enablemultipleattempts->value == 0) {
                 $isrepeated = self::is_completion_repeated($event->courseid, $event->relateduserid, $event->contextinstanceid);
-                
+
                 if ($isrepeated) {
                     return;
                 }
@@ -108,7 +108,7 @@ class block_ranking_helper {
 
         $cmc = $DB->get_record('course_modules_completion', array('coursemoduleid' => $coursemoduleid, 'userid' => $userid), '*');
 
-        if ($cmc->id && $cmc->completionstate != 0) {
+        if ($cmc && $cmc->id && $cmc->completionstate != 0) {
             return $cmc->id;
         }
 
@@ -142,7 +142,10 @@ class block_ranking_helper {
 
         $cmc = $DB->get_record('course_modules_completion', array('id' => $cmcid), '*');
 
-        return (bool) $cmc->completionstate;
+        if ($cmc) {
+            return (bool) $cmc->completionstate;
+        }
+        return false;
     }
 
     /**
