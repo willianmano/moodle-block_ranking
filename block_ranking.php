@@ -93,7 +93,7 @@ class block_ranking extends block_base {
 
         $this->content->text = $rankingstables . $individualranking;
 
-        $this->content->footer .= html_writer::tag('p',
+        $this->content->footer = html_writer::tag('p',
                                         html_writer::link(
                                             new moodle_url(
                                                 '/blocks/ranking/report.php',
@@ -103,6 +103,20 @@ class block_ranking extends block_base {
                                             array('class' => 'btn btn-default')
                                         )
                                   );
+
+          $context = context_course::instance($this->page->course->id);
+          if (has_capability('moodle/site:accessallgroups', $context)) {
+            $this->content->footer .= html_writer::tag('p',
+                                          html_writer::link(
+                                              new moodle_url(
+                                                  '/blocks/ranking/graphs.php',
+                                                  array('courseid' => $this->page->course->id)
+                                              ),
+                                              get_string('ranking_graphs', 'block_ranking'),
+                                              array('class' => 'btn btn-default')
+                                          )
+                                    );
+          }
 
         return $this->content;
     }

@@ -312,6 +312,177 @@ function generate_table($data) {
 }
 
 /**
+ * Get the groups total points
+ *
+ * @return mixed
+ */
+function block_ranking_get_total_points_by_group() {
+    global $COURSE, $DB;
+
+    $sql = "SELECT
+              g.name as groupname, SUM(rp.points) as points
+            FROM {ranking_points} rp
+            INNER JOIN {user} u ON u.id = rp.userid
+            INNER JOIN {groups_members} gm ON gm.userid = rp.userid
+            INNER JOIN {groups} g ON g.id = gm.groupid
+            WHERE rp.courseid = :courseid
+            GROUP BY g.name";
+
+    $params['courseid'] = $COURSE->id;
+
+    return array_values($DB->get_records_sql($sql, $params));
+}
+
+function block_ranking_get_total_students_by_group() {
+    global $COURSE, $DB;
+
+    $sql = "SELECT
+            g.name as groupname, count(g.name) as qtd
+            FROM mdl_ranking_points rp
+            INNER JOIN mdl_user u ON u.id = rp.userid
+            INNER JOIN mdl_groups_members gm ON gm.userid = rp.userid
+            INNER JOIN mdl_groups g ON g.id = gm.groupid
+            WHERE rp.courseid = :courseid
+            GROUP BY g.name";
+
+    $params['courseid'] = $COURSE->id;
+
+    return array_values($DB->get_records_sql($sql, $params));
+}
+
+/**
+ * Get the groups total points
+ *
+ * @return mixed
+ */
+function block_ranking_get_average_points_by_group() {
+    global $COURSE, $DB;
+
+    $groups = block_ranking_get_total_points_by_group();
+
+    $groupsMembersNumber = block_ranking_get_total_students_by_group();
+
+    foreach ($groups as $key => $value) {
+        foreach ($groupsMembersNumber as $group) {
+          if($value->groupname == $group->groupname) {
+            $groups[$key]->points = $value->points / $group->qtd;
+            continue 2;
+          }
+        }
+    }
+
+    return $groups;
+}
+
+function block_ranking_get_points_evolution_by_group($groupid) {
+    global $DB;
+
+    $sql = "SELECT
+              rl.id, rl.points, rl.timecreated
+            FROM {ranking_logs} rl
+            INNER JOIN {ranking_points} rp ON rp.id = rl.rankingid
+            INNER JOIN {groups_members} gm ON gm.userid = rp.userid
+            INNER JOIN {groups} g ON g.id = gm.groupid
+            WHERE g.id = :groupid AND rl.timecreated > :lastweek";
+
+    $lastweek = time() - (7 * 24 * 60 * 60);
+
+    $params['groupid'] = $groupid;
+    $params['lastweek'] = $lastweek;
+
+    return array_values($DB->get_records_sql($sql, $params));
+}
+
+function block_ranking_create_group_points_evolution_chart($groupid) {
+    $records = block_ranking_get_points_evolution_by_group($groupid);
+
+    $pointsByDate = [];
+    // Pega o primeiro registro, tira do array e soma os pontos na data
+    if (sizeof($records)) {
+      $firstRecord = array_shift($records);
+      $lastDate = date('d-m-Y', $firstRecord->timecreated);
+
+      $pointsByDate[$lastDate] = $firstRecord->points;
+    }
+
+    // Percorre os demais registros
+    if (sizeof($records)) {
+      foreach ($records as $points) {
+        $currentDate = date('d-m-Y', $points->timecreated);
+
+        if ($lastDate != $currentDate && !array_key_exists($currentDate, $pointsByDate)) {
+          $lastDate = $currentDate;
+
+          // Cria novo indice de novo data com valor zero
+          $pointsByDate[$lastDate] = 0;
+        }
+
+        $pointsByDate[$lastDate] += $points->points;
+
+      }
+    }
+
+    if (empty($pointsByDate)) {
+      return '';
+    }
+
+    $chart = new \core\chart_line(); // Create a bar chart instance.
+    $chart->set_smooth(true);
+    $series = new \core\chart_series(get_string('graph_group_evolution_title', 'block_ranking'), array_values($pointsByDate));
+    $series->set_type(\core\chart_series::TYPE_LINE);
+    $chart->add_series($series);
+    $chart->set_labels(array_keys($pointsByDate));
+
+    return $chart;
+}
+
+/**
+ * Return a graph of groups points
+ *
+ * @return \core\chart_bar
+ */
+function block_ranking_create_groups_points_chart() {
+    $groups = block_ranking_get_total_points_by_group();
+
+    $labels = [];
+    $values = [];
+    foreach ($groups as $key => $value) {
+      $labels[] = $value->groupname;
+      $values[] = $value->points;
+    }
+
+    $chart = new \core\chart_bar(); // Create a bar chart instance.
+    $series = new \core\chart_series(get_string('graph_groups', 'block_ranking'), $values);
+    $chart->add_series($series);
+    $chart->set_labels($labels);
+
+    return $chart;
+}
+
+/**
+ * Return a graph of groups points average
+ *
+ * @return \core\chart_bar
+ */
+function block_ranking_create_groups_points_average_chart() {
+    $groups = block_ranking_get_average_points_by_group();
+
+    $labels = [];
+    $values = [];
+    foreach ($groups as $key => $value) {
+      $labels[] = $value->groupname;
+      $values[] = $value->points;
+    }
+
+    $chart = new \core\chart_bar(); // Create a bar chart instance.
+    $series = new \core\chart_series(get_string('graph_groups_avg', 'block_ranking'), $values);
+    $chart->add_series($series);
+    $chart->set_labels($labels);
+
+    return $chart;
+}
+
+/**
  * Verify if the user is a student
  *
  * @param int
