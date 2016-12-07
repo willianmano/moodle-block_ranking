@@ -85,7 +85,7 @@ $select->label = get_string('graph_types', 'block_ranking');
 echo $OUTPUT->render($select);
 
 $chart = '';
-if ($report_type == 'group') {
+if ($report_type == '' || $report_type == 'group') {
     $chart = block_ranking_create_groups_points_chart();
 }
 
