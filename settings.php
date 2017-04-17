@@ -50,6 +50,14 @@ if ($ADMIN->fulltree) {
     $settings->add(new admin_setting_configtext('block_ranking/defaultpoints', get_string('defaultpoints', 'block_ranking'),
         '', 2, PARAM_INT));
 
-    $settings->add(new admin_setting_configselect('block_ranking/enable_multiple_quizz_attempts', get_string('enable_multiple_quizz_attempts', 'block_ranking'),
-        get_string('enable_multiple_quizz_attempts_help', 'block_ranking'), '1', array('1' => get_string('yes', 'block_ranking'), '0' => get_string('no', 'block_ranking'))));
+    $settings->add(new admin_setting_configselect(
+                    'block_ranking/enable_multiple_quizz_attempts',
+                    get_string('enable_multiple_quizz_attempts', 'block_ranking'),
+                    get_string('enable_multiple_quizz_attempts_help', 'block_ranking'),
+                    '1',
+                    array(
+                        '1' => get_string('yes', 'block_ranking'),
+                        '0' => get_string('no', 'block_ranking')
+                    )
+                ));
 }

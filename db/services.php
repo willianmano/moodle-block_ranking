@@ -14,6 +14,7 @@
 // You should have received a copy of the GNU General Public License
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
+defined('MOODLE_INTERNAL') || die();
 
 /**
  * Ranking external functions and service definitions.
@@ -24,9 +25,7 @@
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  * @since      Moodle 3.1
  */
-
 $functions = array(
-
     'blocks_ranking_get_ranking' => array(
         'classname' => 'blocks_ranking_external',
         'classpath'   => 'blocks/ranking/classes/external.php',

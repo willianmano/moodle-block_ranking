@@ -3,7 +3,7 @@
 }
 
 .block_ranking #ranking-tabs ul {
-    border: solid #15629F;
+    border: solid #15629f;
     border-width: 0 0 5px;
 }
 
@@ -15,9 +15,9 @@
     padding: 7px 12px;
 }
 
-.block_ranking #ranking-tabs ul .yui3-tab-selected .yui3-tab-label{
-    background: #15629F;
-    border-color: #15629F;
+.block_ranking #ranking-tabs ul .yui3-tab-selected .yui3-tab-label {
+    background: #15629f;
+    border-color: #15629f;
 }
 
 .ranking-report .groupselector {

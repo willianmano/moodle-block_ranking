@@ -25,13 +25,14 @@
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
+defined('MOODLE_INTERNAL') || die();
+
 /**
  * Upgrade the ranking block
  * @param int $oldversion
  * @param object $block
  * @return bool
  */
-
 function xmldb_block_ranking_upgrade($oldversion, $block) {
     global $DB;
 
@@ -44,6 +45,8 @@ function xmldb_block_ranking_upgrade($oldversion, $block) {
         if ($dbman->table_exists($table)) {
             $dbman->drop_table($table);
         }
+
+        upgrade_plugin_savepoint(true, 2015030300, 'block', 'ranking');
     }
 
     if ($oldversion > 2015030300 && $oldversion < 2015051800) {
@@ -53,6 +56,8 @@ function xmldb_block_ranking_upgrade($oldversion, $block) {
         );
 
         $DB->delete_records('config_plugins', $criteria);
+
+        upgrade_plugin_savepoint(true, 2015051800, 'block', 'ranking');
     }
 
     return true;

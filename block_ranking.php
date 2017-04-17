@@ -104,8 +104,8 @@ class block_ranking extends block_base {
                                         )
                                   );
 
-          $context = context_course::instance($this->page->course->id);
-          if (has_capability('moodle/site:accessallgroups', $context)) {
+        $context = context_course::instance($this->page->course->id);
+        if (has_capability('moodle/site:accessallgroups', $context)) {
             $this->content->footer .= html_writer::tag('p',
                                           html_writer::link(
                                               new moodle_url(
@@ -116,7 +116,7 @@ class block_ranking extends block_base {
                                               array('class' => 'btn btn-default')
                                           )
                                     );
-          }
+        }
 
         return $this->content;
     }

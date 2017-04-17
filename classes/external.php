@@ -47,10 +47,6 @@ class blocks_ranking_external extends external_api {
      * @since Moodle 2.9
      */
     public static function get_ranking_parameters() {
-    
-    	error_log('blocks/ranking/classes/external.php: get_ranking_parameters');
-    	
-    	
         return new external_function_parameters (
             array(
                 'courseids' => new external_multiple_structure(
@@ -71,120 +67,100 @@ class blocks_ranking_external extends external_api {
      */
     public static function get_ranking($courseids = array()) {
         global $CFG;
-    	global $PAGE, $DB ,$USER;
-    	global $COURSE;
-    	global $OUTPUT;
-    	
+        global $PAGE, $DB ,$USER;
+        global $COURSE;
+        global $OUTPUT;
+        
         $params = self::validate_parameters(self::get_ranking_parameters(), array('courseids' => $courseids));
         $warnings = array();
-        
-        error_log('blocks/ranking/classes/external.php: get_ranking');
 
         $mycourses = array();
-//         if (empty($params['courseids'])) {
-//             $mycourses = enrol_get_my_courses();
-//             $params['courseids'] = array_keys($mycourses);
-//         }
 
         // Array to store the databases to return.
         $arrdatabases = array();
 
-		$studentlist = array();
-		
+        $studentlist = array();
+        
         // Ensure there are courseids to loop through.
         if (!empty($params['courseids'])) {
-        	foreach ($params['courseids'] as $courseid) {
-        		error_log('blocks/ranking/classes/external.php: get_ranking courseid: '.$courseid);
-        	
-        		// from report.php
-        		$course = $DB->get_record('course', array('id' => $courseid), '*', MUST_EXIST);
-        		
-        		error_log('blocks/ranking/classes/external.php: get_ranking coursename: '.$course->fullname);
-        	
-	        	require_login($courseid);
-				$context = context_course::instance($courseid);
-				
-        		$perpage = 100;
-        		$group = null;
-			
-				$userfields = user_picture::fields('u', array('username'));
-				$from = "FROM {user} u
-						INNER JOIN {role_assignments} a ON a.userid = u.id
-						LEFT JOIN {ranking_points} r ON r.userid = u.id AND r.courseid = :r_courseid
-						INNER JOIN {context} c ON c.id = a.contextid";
+            foreach ($params['courseids'] as $courseid) {
+                error_log('blocks/ranking/classes/external.php: get_ranking courseid: '.$courseid);
+            
+                // from report.php
+                $course = $DB->get_record('course', array('id' => $courseid), '*', MUST_EXIST);
 
-				$where = "WHERE a.contextid = :contextid
-						AND a.userid = u.id
-						AND a.roleid = :roleid
-						AND c.instanceid = :courseid";
+                require_login($courseid);
+                $context = context_course::instance($courseid);
+                
+                $perpage = 100;
+                $group = null;
+            
+                $userfields = user_picture::fields('u', array('username'));
+                $from = "FROM {user} u
+                        INNER JOIN {role_assignments} a ON a.userid = u.id
+                        LEFT JOIN {ranking_points} r ON r.userid = u.id AND r.courseid = :r_courseid
+                        INNER JOIN {context} c ON c.id = a.contextid";
 
-				$params['contextid'] = $context->id;
-				$params['roleid'] = 5;
-				$params['courseid'] = $COURSE->id;
-				$params['r_courseid'] = $params['courseid'];
+                $where = "WHERE a.contextid = :contextid
+                        AND a.userid = u.id
+                        AND a.roleid = :roleid
+                        AND c.instanceid = :courseid";
 
-				$order = "ORDER BY r.points DESC, u.firstname ASC
-						LIMIT " . $perpage;
+                $params['contextid'] = $context->id;
+                $params['roleid'] = 5;
+                $params['courseid'] = $COURSE->id;
+                $params['r_courseid'] = $params['courseid'];
 
-				if ($group) {
-					$from .= " INNER JOIN {groups_members} gm ON gm.userid = u.id AND gm.groupid = :groupid";
-					$params['groupid'] = $group;
-				}
+                $order = "ORDER BY r.points DESC, u.firstname ASC
+                        LIMIT " . $perpage;
 
-				$sql = "SELECT $userfields, r.points $from $where $order";
+                if ($group) {
+                    $from .= " INNER JOIN {groups_members} gm ON gm.userid = u.id AND gm.groupid = :groupid";
+                    $params['groupid'] = $group;
+                }
 
-				$students = array_values($DB->get_records_sql($sql, $params));        	
-        	
-        		error_log('blocks/ranking/classes/external.php: get_ranking students: '.count($students));
-        		
-        		// from lib.php : generate_table
-        		$data = $students;
-				$lastpos = 1;
-			    $lastpoints = current($data)->points;
-			    for ($i = 0; $i < count($data); $i++) {
-					if ($lastpoints > $data[$i]->points) {
-						$lastpos++;
-						$lastpoints = $data[$i]->points;
-					}			    
+                $sql = "SELECT $userfields, r.points $from $where $order";
 
-					// user picture stuff
-					// https://docs.moodle.org/dev/Output_renderers
-					//$OUTPUT->user_picture($data[$i], array('size' => 24, 'alttext' => false)),
-					//$OUTPUT->user_picture($data[$i], array('courseid' => $courseid, 'link' => true)),							
-					//error_log(print_r($data[$i], true));								
-					
-					// prepare to get user icon url
-					$userid = $data[$i]->id;
-					$context = context_user::instance($userid);
-					$contextid = $context->id;					
-					$image = null;
-					
-					$url = moodle_url::make_pluginfile_url($contextid, 'user', 'icon', null, '/', $image);					
-					//error_log('url: '.$url);
-					// http://localhost/moodle/pluginfile.php/71/user/icon
-					
-					// position, picture, name, points
-			        $row = array(
+                $students = array_values($DB->get_records_sql($sql, $params));          
+            
+                error_log('blocks/ranking/classes/external.php: get_ranking students: '.count($students));
+                
+                // from lib.php : generate_table
+                $data = $students;
+                $lastpos = 1;
+                $lastpoints = current($data)->points;
+                for ($i = 0; $i < count($data); $i++) {
+                    if ($lastpoints > $data[$i]->points) {
+                        $lastpos++;
+                        $lastpoints = $data[$i]->points;
+                    }
+                    
+                    // prepare to get user icon url
+                    $userid = $data[$i]->id;
+                    $context = context_user::instance($userid);
+                    $contextid = $context->id;                  
+                    $image = null;
+                    
+                    $url = moodle_url::make_pluginfile_url($contextid, 'user', 'icon', null, '/', $image);
+                    
+                    // position, picture, name, points
+                    $row = array(
                         "position" => $lastpos,
                         "picture" => urlencode($url),
                         "name" => $data[$i]->firstname,
                         "points" => $data[$i]->points ?: 0
                     );
-                    			    
-					error_log('blocks/ranking/classes/external.php: get_ranking student['.$i.']: ');
-					//error_log(print_r($row, true));				
-					
-					$studentlist[] = $row;	
-			    }        		
-        	}
+                    
+                    $studentlist[] = $row;  
+                }               
+            }
         }
       
 
         $result = array();
         $result['leaderboard'] = $studentlist;
         $result['warnings'] = $warnings;
-        
-        //$attemptData = json_encode($result);
+
         $attemptData = $result;
         
         return $attemptData;
@@ -197,32 +173,20 @@ class blocks_ranking_external extends external_api {
      * @since Moodle 2.9
      */
     public static function get_ranking_returns() {
-
-		error_log('blocks/ranking/classes/external.php: get_ranking_returns');
-
-		//return new external_single_structure();
-		
-		//return new external_value(PARAM_RAW, 'trfdsaz');		
-		
         return new external_single_structure(
             array(
-
                 'leaderboard' => new external_multiple_structure(
                     new external_single_structure(
                         array(
                             'position' => new external_value(PARAM_INT, 'position'),
-                            //'picture' => new external_value(PARAM_RAW, 'picture', VALUE_DEFAULT, null),
                             'picture' => new external_value(PARAM_TEXT,'picture url'),
                             'name' => new external_value(PARAM_RAW, 'name'),
-                            'points' => new external_value(PARAM_FLOAT, 'points'),                                                                                   
-						)
-					)
-				),
-
-
+                            'points' => new external_value(PARAM_FLOAT, 'points')
+                        )
+                    )
+                ),
                 'warnings' => new external_warnings(),
             )
         );
     }
-
 }

@@ -1,6 +1,6 @@
-M.block_ranking = {};
+M.blockranking = {};
 
-M.block_ranking.init_tabview = function(Y) {
+M.blockranking.inittabview = function(Y) {
     Y.use("tabview", function(Y) {
         var tabview = new Y.TabView({srcNode:'#ranking-tabs'});
         tabview.render();

@@ -25,6 +25,8 @@
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
+defined('MOODLE_INTERNAL') || die();
+
 define ('DEFAULT_POINTS', 2);
 
 // Store the courses contexts.
@@ -151,7 +153,7 @@ function block_ranking_print_students($rankinglastmonth, $rankinglastweek, $rank
     $tablelastmonth = generate_table($rankinglastmonth);
     $tablegeral = generate_table($rankinggeral);
 
-    $PAGE->requires->js_init_call('M.block_ranking.init_tabview');
+    $PAGE->requires->js_init_call('M.blockranking.inittabview');
 
     return '<div id="ranking-tabs">
                 <ul>
