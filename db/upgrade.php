@@ -44,8 +44,6 @@ function xmldb_block_ranking_upgrade($oldversion, $block) {
         if ($dbman->table_exists($table)) {
             $dbman->drop_table($table);
         }
-
-        upgrade_plugin_savepoint(true, 2015030300, 'block', 'ranking');
     }
 
     if ($oldversion > 2015030300 && $oldversion < 2015051800) {
@@ -55,8 +53,6 @@ function xmldb_block_ranking_upgrade($oldversion, $block) {
         );
 
         $DB->delete_records('config_plugins', $criteria);
-
-        upgrade_plugin_savepoint(true, 2015051800, 'block', 'ranking');
     }
 
     upgrade_plugin_savepoint(true, 2017041700, 'block', 'ranking');
