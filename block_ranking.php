@@ -24,7 +24,6 @@
 
 defined('MOODLE_INTERNAL') || die();
 
-require_once(dirname(__FILE__) . '/../../config.php');
 require_once($CFG->dirroot.'/blocks/ranking/lib.php');
 
 /**

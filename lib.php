@@ -151,7 +151,7 @@ function block_ranking_print_students($rankinglastmonth, $rankinglastweek, $rank
     $tablelastmonth = generate_table($rankinglastmonth);
     $tablegeral = generate_table($rankinggeral);
 
-    $PAGE->requires->js_init_call('M.blockranking.inittabview');
+    $PAGE->requires->js_init_call('M.block_ranking.inittabview');
 
     return '<div id="ranking-tabs">
                 <ul>
