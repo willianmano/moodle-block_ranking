@@ -14,14 +14,18 @@
 // You should have received a copy of the GNU General Public License
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
+/**
+ * Block ranking manager
+ *
+ * @package    block_ranking
+ * @copyright  2017 Willian Mano http://conecti.me
+ * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ */
+
 defined('MOODLE_INTERNAL') || die();
 
 /**
- * Block ranking manager class.
- *
- * @package    block_ranking
- * @copyright  2015 Willian Mano http://willianmano.net
- * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ * Block ranking manager class
  */
 class block_ranking_manager {
 
@@ -32,6 +36,8 @@ class block_ranking_manager {
 
     /**
      * Block global configurations
+     *
+     * @var mixed $config
      */
     protected static $config = null;
 

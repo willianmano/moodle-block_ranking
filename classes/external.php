@@ -14,11 +14,6 @@
 // You should have received a copy of the GNU General Public License
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
-defined('MOODLE_INTERNAL') || die;
-
-require_once("$CFG->libdir/externallib.php");
-require_once($CFG->dirroot.'/blocks/ranking/lib.php');
-
 /**
  * Ranking external functions and service definitions.
  *
@@ -26,6 +21,15 @@ require_once($CFG->dirroot.'/blocks/ranking/lib.php');
  * @copyright  2016 J. Kalkhof <jerry@ccadapps.com>
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  * @since      Moodle 3.1
+ */
+
+defined('MOODLE_INTERNAL') || die;
+
+require_once("$CFG->libdir/externallib.php");
+require_once($CFG->dirroot.'/blocks/ranking/lib.php');
+
+/**
+ * Ranking external functions and service definitions class
  */
 class blocks_ranking_external extends external_api {
 

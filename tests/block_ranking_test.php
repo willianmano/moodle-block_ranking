@@ -14,16 +14,26 @@
 // You should have received a copy of the GNU General Public License
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
+/**
+ * Ranking block tests
+ *
+ * @package   block_ranking
+ * @copyright 2017 Willian Mano http://conecti.me
+ * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ */
+
 defined('MOODLE_INTERNAL') || die();
 
- /**
-  * Ranking block test class
-  *
-  * @package   block_ranking
-  * @copyright 2015 Willian Mano http://willianmano.net
-  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
-  */
+/**
+ * Ranking block test class
+ */
 class block_ranking_testcase extends advanced_testcase {
+
+    /**
+     * Dumb tests
+     *
+     * @return void
+     */
     public function test_adding() {
         $this->resetAfterTest(true);
 

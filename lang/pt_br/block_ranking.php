@@ -18,10 +18,8 @@
 /**
  * Ranking block portuguese language translation
  *
- * @package    contrib
- * @subpackage block_ranking
- * @copyright  2015 Willian Mano http://willianmano.net
- * @authors    Willian Mano
+ * @package    block_ranking
+ * @copyright  2017 Willian Mano http://conecti.me
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 

@@ -19,7 +19,7 @@
  * Ranking block upgrade
  *
  * @package    block_ranking
- * @copyright  2015 Willian Mano http://willianmano.net
+ * @copyright  2017 Willian Mano http://conecti.me
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
@@ -58,6 +58,8 @@ function xmldb_block_ranking_upgrade($oldversion, $block) {
 
         upgrade_plugin_savepoint(true, 2015051800, 'block', 'ranking');
     }
+
+    upgrade_plugin_savepoint(true, 2017041700, 'block', 'ranking');
 
     return true;
 }
