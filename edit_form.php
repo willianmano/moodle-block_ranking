@@ -14,23 +14,25 @@
 // You should have received a copy of the GNU General Public License
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
-
-/**
- * Ranking block configuration form definition
- *
- * @package    contrib
- * @subpackage block_ranking
- * @copyright  2015 Willian Mano http://willianmano.net
- * @authors    Willian Mano
- * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
- */
-
 defined('MOODLE_INTERNAL') || die();
 
 require_once("$CFG->libdir/formslib.php");
 
+/**
+ * Ranking block configuration form definition
+ *
+ * @package   block_ranking
+ * @copyright 2015 Willian Mano http://willianmano.net
+ * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ */
 class block_ranking_edit_form extends block_edit_form {
 
+    /**
+     * Ranking form definition
+     *
+     * @param mixed $mform
+     * @return void
+     */
     public function specific_definition($mform) {
         global $CFG;
 

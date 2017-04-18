@@ -18,10 +18,8 @@
 /**
  * Ranking block capability setup
  *
- * @package    contrib
- * @subpackage block_ranking
+ * @package    block_ranking
  * @copyright  2015 Willian Mano http://willianmano.net
- * @authors    Willian Mano
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 

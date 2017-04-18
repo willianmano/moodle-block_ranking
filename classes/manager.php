@@ -14,17 +14,6 @@
 // You should have received a copy of the GNU General Public License
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
-
-/**
- * Ranking block manager
- *
- * @package    contrib
- * @subpackage block_ranking
- * @copyright  2015 Willian Mano http://willianmano.net
- * @authors    Willian Mano
- * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
- */
-
 defined('MOODLE_INTERNAL') || die();
 
 /**
@@ -36,11 +25,18 @@ defined('MOODLE_INTERNAL') || die();
  */
 class block_ranking_manager {
 
+    /**
+    * Activities default points
+    */
     const DEFAULT_POINTS = 2;
 
+    /**
+    * Block global configurations
+    */
     protected static $config = null;
 
     /**
+     * Add points to user
      *
      * @param int $cmcid
      * @param float $grade
@@ -81,7 +77,7 @@ class block_ranking_manager {
     /**
      * Returns the modules completions
      *
-     * @param int
+     * @param int $cmcid
      * @return mixed
      */
     protected static function get_module_completion($cmcid) {
@@ -114,6 +110,9 @@ class block_ranking_manager {
     /**
      * Default method to add points to students
      *
+     * @param mixed $completion
+     * @param float $points
+     * @param float $grade
      * @return void
      */
     protected static function add_default_points($completion, $points = null, $grade = null) {
@@ -144,9 +143,9 @@ class block_ranking_manager {
     /**
      * Returns activity grade
      *
-     * @param int
-     * @param int
-     * @param int
+     * @param int $activity
+     * @param int $activityid
+     * @param int $userid
      * @return float
      */
     protected static function get_activity_finalgrade($activity, $activityid, $userid) {
@@ -186,8 +185,8 @@ class block_ranking_manager {
     /**
      * Returns activity grade by scale
      *
-     * @param int
-     * @param int
+     * @param int $finalgrade
+     * @param int $scaleid
      * @return int
      */
     protected static function get_finalgrade_by_scale($finalgrade, $scaleid) {
@@ -211,9 +210,9 @@ class block_ranking_manager {
     /**
      * Save students points
      *
-     * @param int
-     * @param int
-     * @param int
+     * @param int $userid
+     * @param int $courseid
+     * @param int $points
      * @return int
      */
     protected static function add_or_update_user_points($userid, $courseid, $points) {
@@ -249,10 +248,10 @@ class block_ranking_manager {
     /**
      * Add points movement to log
      *
-     * @param int
-     * @param int
-     * @param int
-     * @param int
+     * @param int $rankingid
+     * @param int $courseid
+     * @param int $cmc
+     * @param int $points
      * @return int
      */
     protected static function add_ranking_log($rankingid, $courseid, $cmc, $points) {

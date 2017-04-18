@@ -14,22 +14,18 @@
 // You should have received a copy of the GNU General Public License
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
-
-/**
- * Ranking block definition
- *
- * @package    contrib
- * @subpackage block_ranking
- * @copyright  2015 Willian Mano http://willianmano.net
- * @authors    Willian Mano
- * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
- */
-
 defined('MOODLE_INTERNAL') || die();
 
 require_once(dirname(__FILE__) . '/../../config.php');
 require_once($CFG->dirroot.'/blocks/ranking/lib.php');
 
+/**
+ * Ranking block definition
+ *
+ * @package   block_ranking
+ * @copyright 2015 Willian Mano http://willianmano.net
+ * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ */
 class block_ranking extends block_base {
 
     /**

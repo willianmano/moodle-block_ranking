@@ -14,16 +14,6 @@
 // You should have received a copy of the GNU General Public License
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
-/**
- * Ranking external api.
- *
- * @package    contrib
- * @subpackage block_ranking
- * @copyright  2016 J. Kalkhof <jerry@ccadapps.com>
- * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
- * @since      Moodle 3.1
- */
-
 defined('MOODLE_INTERNAL') || die;
 
 require_once("$CFG->libdir/externallib.php");
@@ -32,8 +22,7 @@ require_once($CFG->dirroot.'/blocks/ranking/lib.php');
 /**
  * Ranking external functions and service definitions.
  *
- * @package    contrib
- * @subpackage block_ranking
+ * @package    block_ranking
  * @copyright  2016 J. Kalkhof <jerry@ccadapps.com>
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  * @since      Moodle 3.1
@@ -66,11 +55,8 @@ class blocks_ranking_external extends external_api {
      * @since Moodle 2.9
      */
     public static function get_ranking($courseids = array()) {
-        global $CFG;
-        global $PAGE, $DB ,$USER;
-        global $COURSE;
-        global $OUTPUT;
-        
+        global $DB, $COURSE;
+
         $params = self::validate_parameters(self::get_ranking_parameters(), array('courseids' => $courseids));
         $warnings = array();
 
@@ -80,21 +66,19 @@ class blocks_ranking_external extends external_api {
         $arrdatabases = array();
 
         $studentlist = array();
-        
+
         // Ensure there are courseids to loop through.
         if (!empty($params['courseids'])) {
             foreach ($params['courseids'] as $courseid) {
-                error_log('blocks/ranking/classes/external.php: get_ranking courseid: '.$courseid);
-            
-                // from report.php
+                // Code get from report.php .
                 $course = $DB->get_record('course', array('id' => $courseid), '*', MUST_EXIST);
 
                 require_login($courseid);
                 $context = context_course::instance($courseid);
-                
+
                 $perpage = 100;
                 $group = null;
-            
+
                 $userfields = user_picture::fields('u', array('username'));
                 $from = "FROM {user} u
                         INNER JOIN {role_assignments} a ON a.userid = u.id
@@ -108,7 +92,7 @@ class blocks_ranking_external extends external_api {
 
                 $params['contextid'] = $context->id;
                 $params['roleid'] = 5;
-                $params['courseid'] = $COURSE->id;
+                $params['courseid'] = $course->id;
                 $params['r_courseid'] = $params['courseid'];
 
                 $order = "ORDER BY r.points DESC, u.firstname ASC
@@ -121,11 +105,9 @@ class blocks_ranking_external extends external_api {
 
                 $sql = "SELECT $userfields, r.points $from $where $order";
 
-                $students = array_values($DB->get_records_sql($sql, $params));          
-            
-                error_log('blocks/ranking/classes/external.php: get_ranking students: '.count($students));
-                
-                // from lib.php : generate_table
+                $students = array_values($DB->get_records_sql($sql, $params));
+
+                // Code get from lib.php : generate_table .
                 $data = $students;
                 $lastpos = 1;
                 $lastpoints = current($data)->points;
@@ -134,36 +116,33 @@ class blocks_ranking_external extends external_api {
                         $lastpos++;
                         $lastpoints = $data[$i]->points;
                     }
-                    
-                    // prepare to get user icon url
+
+                    // Prepare to get user icon url.
                     $userid = $data[$i]->id;
                     $context = context_user::instance($userid);
-                    $contextid = $context->id;                  
+                    $contextid = $context->id;
                     $image = null;
-                    
+
                     $url = moodle_url::make_pluginfile_url($contextid, 'user', 'icon', null, '/', $image);
-                    
-                    // position, picture, name, points
+
+                    // Position, picture, name, points.
                     $row = array(
                         "position" => $lastpos,
                         "picture" => urlencode($url),
                         "name" => $data[$i]->firstname,
                         "points" => $data[$i]->points ?: 0
                     );
-                    
-                    $studentlist[] = $row;  
-                }               
+
+                    $studentlist[] = $row;
+                }
             }
         }
-      
 
         $result = array();
         $result['leaderboard'] = $studentlist;
         $result['warnings'] = $warnings;
 
-        $attemptData = $result;
-        
-        return $attemptData;
+        return $result;
     }
 
     /**
@@ -179,7 +158,7 @@ class blocks_ranking_external extends external_api {
                     new external_single_structure(
                         array(
                             'position' => new external_value(PARAM_INT, 'position'),
-                            'picture' => new external_value(PARAM_TEXT,'picture url'),
+                            'picture' => new external_value(PARAM_TEXT, 'picture url'),
                             'name' => new external_value(PARAM_RAW, 'name'),
                             'points' => new external_value(PARAM_FLOAT, 'points')
                         )

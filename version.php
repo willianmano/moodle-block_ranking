@@ -18,16 +18,14 @@
 /**
  * Ranking block version details
  *
- * @package    contrib
- * @subpackage block_ranking
+ * @package    block_ranking
  * @copyright  2015 Willian Mano http://willianmano.net
- * @authors    Willian Mano
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
 defined('MOODLE_INTERNAL') || die();
 
-$plugin->version   = 2016120700;
+$plugin->version   = 2017041700;
 $plugin->requires  = 2011120511;
 $plugin->maturity  = MATURITY_STABLE;
 $plugin->release   = 'Version for Moodle 2.9 onwards';

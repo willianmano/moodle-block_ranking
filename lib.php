@@ -14,14 +14,11 @@
 // You should have received a copy of the GNU General Public License
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
-
 /**
- * Ranking block definition
+ * Ranking block global lib
  *
- * @package    contrib
- * @subpackage block_ranking
+ * @package    block_ranking
  * @copyright  2015 Willian Mano http://willianmano.net
- * @authors    Willian Mano
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
@@ -35,7 +32,7 @@ $coursescontexts = array();
 /**
  * Return the list of students in the course ranking
  *
- * @param int
+ * @param int $limit
  * @return mixed
  */
 function block_ranking_get_students($limit = null) {
@@ -84,12 +81,12 @@ function block_ranking_get_students($limit = null) {
 /**
  * Get the students points based on a time interval
  *
- * @param int
- * @param int
- * @param int
+ * @param int $limit
+ * @param int $datestart
+ * @param int $dateend
  * @return mixed
  */
-function block_ranking_get_students_by_date($limit = null, $datestart, $dateend) {
+function block_ranking_get_students_by_date($limit = 0, $datestart, $dateend) {
     global $COURSE, $DB, $PAGE;
 
     // Get block ranking configuration.
@@ -141,6 +138,7 @@ function block_ranking_get_students_by_date($limit = null, $datestart, $dateend)
 
 /**
  * Build the ranking table to be viewd in the course
+ *
  * @param array $rankinglastmonth List of students of the last month ranking
  * @param array $rankinglastweek List of students of the last week ranking
  * @param array $rankinggeral List of students to be print in ranking block
@@ -215,7 +213,7 @@ function block_ranking_print_individual_ranking() {
 /**
  * Get the student points
  *
- * @param int
+ * @param int $userid
  * @return mixed
  */
 function block_ranking_get_student_points($userid) {
@@ -240,9 +238,9 @@ function block_ranking_get_student_points($userid) {
 /**
  * Get the student points based on a time interval
  *
- * @param int
- * @param int
- * @param int
+ * @param int $userid
+ * @param int $datestart
+ * @param int $dateend
  * @return mixed
  */
 function block_ranking_get_student_points_by_date($userid, $datestart, $dateend) {
@@ -270,7 +268,7 @@ function block_ranking_get_student_points_by_date($userid, $datestart, $dateend)
 /**
  * Return a table of ranking based on data passed
  *
- * @param mixed
+ * @param mixed $data
  * @return mixed
  */
 function generate_table($data) {
@@ -316,7 +314,7 @@ function generate_table($data) {
 /**
  * Get the groups total points
  *
- * @return mixed
+ * @return array
  */
 function block_ranking_get_total_points_by_group() {
     global $COURSE, $DB;
@@ -335,6 +333,11 @@ function block_ranking_get_total_points_by_group() {
     return array_values($DB->get_records_sql($sql, $params));
 }
 
+/**
+ * Return the total of students of a group
+ *
+ * @return array
+ */
 function block_ranking_get_total_students_by_group() {
     global $COURSE, $DB;
 
@@ -362,20 +365,26 @@ function block_ranking_get_average_points_by_group() {
 
     $groups = block_ranking_get_total_points_by_group();
 
-    $groupsMembersNumber = block_ranking_get_total_students_by_group();
+    $groupsmembersnumber = block_ranking_get_total_students_by_group();
 
     foreach ($groups as $key => $value) {
-        foreach ($groupsMembersNumber as $group) {
-          if($value->groupname == $group->groupname) {
-            $groups[$key]->points = $value->points / $group->qtd;
-            continue 2;
-          }
+        foreach ($groupsmembersnumber as $group) {
+            if ($value->groupname == $group->groupname) {
+                $groups[$key]->points = $value->points / $group->qtd;
+                continue 2;
+            }
         }
     }
 
     return $groups;
 }
 
+/**
+ * Return the group points evolution
+ *
+ * @param int $groupid
+ * @return array
+ */
 function block_ranking_get_points_evolution_by_group($groupid) {
     global $DB;
 
@@ -395,45 +404,51 @@ function block_ranking_get_points_evolution_by_group($groupid) {
     return array_values($DB->get_records_sql($sql, $params));
 }
 
+/**
+ * Return a graph of groups points evolution
+ *
+ * @param int $groupid
+ * @return \core\chart_bar
+ */
 function block_ranking_create_group_points_evolution_chart($groupid) {
     $records = block_ranking_get_points_evolution_by_group($groupid);
 
-    $pointsByDate = [];
-    // Pega o primeiro registro, tira do array e soma os pontos na data
-    if (sizeof($records)) {
-      $firstRecord = array_shift($records);
-      $lastDate = date('d-m-Y', $firstRecord->timecreated);
+    $pointsbydate = [];
 
-      $pointsByDate[$lastDate] = $firstRecord->points;
+    // Pega o primeiro registro, tira do array e soma os pontos na data.
+    if (count($records)) {
+        $firstrecord = array_shift($records);
+        $lastdate = date('d-m-Y', $firstrecord->timecreated);
+
+        $pointsbydate[$lastdate] = $firstrecord->points;
     }
 
-    // Percorre os demais registros
-    if (sizeof($records)) {
-      foreach ($records as $points) {
-        $currentDate = date('d-m-Y', $points->timecreated);
+    // Percorre os demais registros.
+    if (count($records)) {
+        foreach ($records as $points) {
+            $currentdate = date('d-m-Y', $points->timecreated);
 
-        if ($lastDate != $currentDate && !array_key_exists($currentDate, $pointsByDate)) {
-          $lastDate = $currentDate;
+            if ($lastdate != $currentdate && !array_key_exists($currentdate, $pointsbydate)) {
+                $lastdate = $currentdate;
 
-          // Cria novo indice de novo data com valor zero
-          $pointsByDate[$lastDate] = 0;
+                // Cria novo indice de novo data com valor zero.
+                $pointsbydate[$lastdate] = 0;
+            }
+
+            $pointsbydate[$lastdate] += $points->points;
         }
-
-        $pointsByDate[$lastDate] += $points->points;
-
-      }
     }
 
-    if (empty($pointsByDate)) {
-      return '';
+    if (empty($pointsbydate)) {
+        return '';
     }
 
     $chart = new \core\chart_line(); // Create a bar chart instance.
     $chart->set_smooth(true);
-    $series = new \core\chart_series(get_string('graph_group_evolution_title', 'block_ranking'), array_values($pointsByDate));
+    $series = new \core\chart_series(get_string('graph_group_evolution_title', 'block_ranking'), array_values($pointsbydate));
     $series->set_type(\core\chart_series::TYPE_LINE);
     $chart->add_series($series);
-    $chart->set_labels(array_keys($pointsByDate));
+    $chart->set_labels(array_keys($pointsbydate));
 
     return $chart;
 }
@@ -449,8 +464,8 @@ function block_ranking_create_groups_points_chart() {
     $labels = [];
     $values = [];
     foreach ($groups as $key => $value) {
-      $labels[] = $value->groupname;
-      $values[] = $value->points;
+        $labels[] = $value->groupname;
+        $values[] = $value->points;
     }
 
     $chart = new \core\chart_bar(); // Create a bar chart instance.
@@ -472,8 +487,8 @@ function block_ranking_create_groups_points_average_chart() {
     $labels = [];
     $values = [];
     foreach ($groups as $key => $value) {
-      $labels[] = $value->groupname;
-      $values[] = $value->points;
+        $labels[] = $value->groupname;
+        $values[] = $value->points;
     }
 
     $chart = new \core\chart_bar(); // Create a bar chart instance.
@@ -487,8 +502,7 @@ function block_ranking_create_groups_points_average_chart() {
 /**
  * Verify if the user is a student
  *
- * @param int
- * @param int
+ * @param int $userid
  * @return bool
  */
 function is_student($userid) {
