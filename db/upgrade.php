@@ -48,7 +48,7 @@ function xmldb_block_ranking_upgrade($oldversion, $block) {
         upgrade_plugin_savepoint(true, 2015030300, 'block', 'ranking');
     }
 
-    if ($oldversion > 2015030300 && $oldversion < 2015051800) {
+    if ($oldversion < 2015051800) {
         $criteria = array(
             'plugin' => 'block_ranking',
             'name' => 'lastcomputedid'

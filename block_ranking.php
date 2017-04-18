@@ -120,6 +120,14 @@ class block_ranking extends block_base {
                                     );
         }
 
+        $this->content->footer .= "
+            <script type='text/javascript'>
+                Y.use('tabview', function(Y) {
+                    var tabview = new Y.TabView({srcNode: '#ranking-tabs'});
+                    tabview.render();
+                });
+            </script>";
+
         return $this->content;
     }
 
