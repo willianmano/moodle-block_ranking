@@ -26,6 +26,9 @@ defined('MOODLE_INTERNAL') || die();
 
 /**
  * Block ranking manager class
+ *
+ * @copyright 2017 Willian Mano http://conecti.me
+ * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class block_ranking_manager {
 

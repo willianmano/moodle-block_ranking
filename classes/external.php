@@ -30,6 +30,9 @@ require_once($CFG->dirroot.'/blocks/ranking/lib.php');
 
 /**
  * Ranking external functions and service definitions class
+ *
+ * @copyright 2017 Willian Mano http://conecti.me
+ * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class blocks_ranking_external extends external_api {
 

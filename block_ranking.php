@@ -29,6 +29,9 @@ require_once($CFG->dirroot.'/blocks/ranking/lib.php');
 
 /**
  * Ranking block definition class
+ *
+ * @copyright 2017 Willian Mano http://conecti.me
+ * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class block_ranking extends block_base {
 

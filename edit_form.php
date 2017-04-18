@@ -28,6 +28,9 @@ require_once("$CFG->libdir/formslib.php");
 
 /**
  * Ranking block configuration form definition class
+ *
+ * @copyright 2017 Willian Mano http://conecti.me
+ * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class block_ranking_edit_form extends block_edit_form {
 
