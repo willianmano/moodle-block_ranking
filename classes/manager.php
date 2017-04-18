@@ -26,13 +26,13 @@ defined('MOODLE_INTERNAL') || die();
 class block_ranking_manager {
 
     /**
-    * Activities default points
-    */
+     * Activities default points
+     */
     const DEFAULT_POINTS = 2;
 
     /**
-    * Block global configurations
-    */
+     * Block global configurations
+     */
     protected static $config = null;
 
     /**
