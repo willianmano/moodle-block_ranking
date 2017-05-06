@@ -39,14 +39,14 @@ $context = context_course::instance($courseid);
 if (!has_capability('moodle/site:accessallgroups', $context)) {
     redirect(new moodle_url('/course/view.php',
                             ['id' => $courseid]),
-                            'Você não tem permissão de visuzizar os grupos do curso para ver este relatório.');
+                            get_string('graph_access_deny', 'block_ranking'));
 }
 
 $groups = groups_get_all_groups($course->id);
 if (empty($groups)) {
     redirect(new moodle_url('/course/view.php',
                            ['id' => $courseid]),
-                           'Este curso não possui grupos para poder visualizar os relatórios.');
+                           get_string('graph_no_groups', 'block_ranking');
 }
 
 // Some stuff.
