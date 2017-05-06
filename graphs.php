@@ -46,7 +46,7 @@ $groups = groups_get_all_groups($course->id);
 if (empty($groups)) {
     redirect(new moodle_url('/course/view.php',
                            ['id' => $courseid]),
-                           get_string('graph_no_groups', 'block_ranking');
+                           get_string('graph_no_groups', 'block_ranking'));
 }
 
 // Some stuff.
