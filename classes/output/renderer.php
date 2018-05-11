@@ -50,4 +50,17 @@ class renderer extends plugin_renderer_base {
 
         return parent::render_from_template('block_ranking/block', $data);
     }
+
+    /**
+     * Defer the report page to template.
+     *
+     * @param renderable $page
+     *
+     * @return string
+     */
+    public function render_report_page(renderable $page) {
+        $data = $page->export_for_template($this);
+
+        return parent::render_from_template('block_ranking/report_page', $data);
+    }
 }

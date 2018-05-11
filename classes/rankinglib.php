@@ -213,4 +213,80 @@ class rankinglib {
 
         return $DB->get_record_sql($sql, $params);
     }
+
+    /**
+     * Return the full ranking of a course
+     *
+     * @param $courseid
+     * @param $contextid
+     * @param $perpage
+     * @param null $groupid
+     *
+     * @return array
+     */
+    public static function get_ranking_general_report($courseid, $contextid, $perpage, $groupid = null) {
+        global $DB;
+
+        $userfields = user_picture::fields('u', array('username'));
+
+        $from = "FROM {user} u
+                INNER JOIN {role_assignments} a ON a.userid = u.id
+                LEFT JOIN {ranking_points} r ON r.userid = u.id AND r.courseid = :r_courseid
+                INNER JOIN {context} c ON c.id = a.contextid";
+
+        $where = "WHERE a.contextid = :contextid
+                AND a.userid = u.id
+                AND a.roleid = :roleid
+                AND c.instanceid = :courseid";
+
+        $params['contextid'] = $contextid;
+        $params['roleid'] = 5;
+        $params['courseid'] = $courseid;
+        $params['r_courseid'] = $params['courseid'];
+
+        $order = "ORDER BY r.points DESC, u.firstname ASC
+        LIMIT " . $perpage;
+
+        if ($groupid) {
+            $from .= " INNER JOIN {groups_members} gm ON gm.userid = u.id AND gm.groupid = :groupid";
+            $params['groupid'] = $groupid;
+        }
+
+        $sql = "SELECT {$userfields}, r.points {$from } {$where } {$order}";
+
+        return array_values($DB->get_records_sql($sql, $params));
+    }
+
+    public static function prepare_ranking_data($data = null) {
+        global $USER, $OUTPUT;
+
+        if (!$data) {
+            return null;
+        }
+
+        $lastpos = 1;
+        $lastpoints = current($data)->points;
+        $returndata = [];
+        for ($i = 0; $i < count($data); $i++) {
+            // Verify if the logged user is present in ranking.
+            $class = '';
+            if ($data[$i]->id == $USER->id) {
+                $class = 'itsme';
+            }
+
+            if ($lastpoints > $data[$i]->points) {
+                $lastpos++;
+                $lastpoints = $data[$i]->points;
+            }
+
+            $returndata[$i] = [
+                'pos' => $lastpos,
+                'user' => $OUTPUT->user_picture($data[$i], array('size' => 24, 'alttext' => false)) . ' '.$data[$i]->firstname,
+                'points' => $data[$i]->points ?: '-',
+                'class' => $class
+            ];
+        }
+
+        return $returndata;
+    }
 }

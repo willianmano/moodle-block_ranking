@@ -92,43 +92,10 @@ class block implements renderable, templatable {
      */
     public function export_for_template(renderer_base $output) {
         return [
-            'rankinglastweek' => $this->prepare_ranking_data($this->rankinglastweek),
-            'rankinglastmonth' => $this->prepare_ranking_data($this->rankinglastmonth),
-            'rankinggeral' => $this->prepare_ranking_data($this->rankinggeral),
+            'rankinglastweek' => rankinglib::prepare_ranking_data($this->rankinglastweek),
+            'rankinglastmonth' => rankinglib::prepare_ranking_data($this->rankinglastmonth),
+            'rankinggeral' => rankinglib::prepare_ranking_data($this->rankinggeral),
             'rankingindividual' => $this->rankingindividual
         ];
-    }
-
-    protected function prepare_ranking_data($data = null) {
-        global $USER, $OUTPUT;
-
-        if (!$data) {
-            return null;
-        }
-
-        $lastpos = 1;
-        $lastpoints = current($data)->points;
-        $returndata = [];
-        for ($i = 0; $i < count($data); $i++) {
-            // Verify if the logged user is present in ranking.
-            $class = '';
-            if ($data[$i]->id == $USER->id) {
-                $class = 'itsme';
-            }
-
-            if ($lastpoints > $data[$i]->points) {
-                $lastpos++;
-                $lastpoints = $data[$i]->points;
-            }
-
-            $returndata[$i] = [
-                'pos' => $lastpos,
-                'user' => $OUTPUT->user_picture($data[$i], array('size' => 24, 'alttext' => false)) . ' '.$data[$i]->firstname,
-                'points' => $data[$i]->points ?: '-',
-                'class' => $class
-            ];
-        }
-
-        return $returndata;
     }
 }

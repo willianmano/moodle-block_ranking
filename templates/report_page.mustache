@@ -1,0 +1,25 @@
+{{^totalstudents}}
+    <h2>{{#str}}nostudents, block_ranking{{/str}}</h2>
+{{/totalstudents}}
+{{#totalstudents}}
+    <h2>{{#str}}report_head, block_ranking, {{{totalstudents}}}{{/str}}</h2>
+
+    <table class="rankingTable table table-striped generaltable">
+        <thead>
+        <tr>
+            <th class="header c0">{{#str}}table_position, block_ranking{{/str}}</th>
+            <th class="header c1">{{#str}}table_name, block_ranking{{/str}}</th>
+            <th class="header c2 lastcol">{{#str}}table_points, block_ranking{{/str}}</th>
+        </tr>
+        </thead>
+        <tbody>
+        {{#students}}
+            <tr class="{{{class}}}">
+                <td class="c0">{{{pos}}}</td>
+                <td class="c1">{{{user}}}</td>
+                <td class="c2 lastcol">{{{points}}}</td>
+            </tr>
+        {{/students}}
+        </tbody>
+    </table>
+{{/totalstudents}}

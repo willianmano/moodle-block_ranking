@@ -79,17 +79,17 @@
             <table class="rankingTable table table-striped generaltable">
                 <thead>
                 <tr>
-                    <th class="header">{{#str}}table_position, block_ranking{{/str}}</th>
-                    <th class="header">{{#str}}table_name, block_ranking{{/str}}</th>
-                    <th class="header lastcol">{{#str}}table_points, block_ranking{{/str}}</th>
+                    <th class="c0 header">{{#str}}table_position, block_ranking{{/str}}</th>
+                    <th class="c1 header">{{#str}}table_name, block_ranking{{/str}}</th>
+                    <th class="c2 header lastcol">{{#str}}table_points, block_ranking{{/str}}</th>
                 </tr>
                 </thead>
                 <tbody>
                 {{#rankinggeral}}
                     <tr class="{{{class}}}">
-                        <td>{{{pos}}}</td>
-                        <td>{{{user}}}</td>
-                        <td class="lastcol">{{{points}}}</td>
+                        <td class="c0">{{{pos}}}</td>
+                        <td class="c1">{{{user}}}</td>
+                        <td class="c2 lastcol">{{{points}}}</td>
                     </tr>
                 {{/rankinggeral}}
                 </tbody>
