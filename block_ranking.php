@@ -24,8 +24,6 @@
 
 defined('MOODLE_INTERNAL') || die();
 
-require_once($CFG->dirroot.'/blocks/ranking/lib.php');
-
 /**
  * Ranking block definition class
  *
@@ -75,39 +73,30 @@ class block_ranking extends block_base {
      * @return string
      */
     public function get_content() {
+        $rankingsize = isset($this->config->ranking_rankingsize) ? trim($this->config->ranking_rankingsize) : 0;
+
         $this->content = new stdClass;
         $this->content->text = '';
         $this->content->footer = '';
 
-        $rankingsize = isset($this->config->ranking_rankingsize) ? trim($this->config->ranking_rankingsize) : 0;
+        $renderable = new \block_ranking\output\block($this->page->course, $this->page->context, $rankingsize);
 
-        $weekstart = strtotime(date('d-m-Y', strtotime('-'.date('w').' days')));
-        $rankinglastweek = block_ranking_get_students_by_date($rankingsize, $weekstart, time());
+        $renderer = $this->page->get_renderer('block_ranking');
 
-        $monthstart = strtotime(date('Y-m-01'));
-        $rankinglastmonth = block_ranking_get_students_by_date($rankingsize, $monthstart, time());
-
-        $rankinggeral = block_ranking_get_students($rankingsize);
-
-        $rankingstables = block_ranking_print_students($rankinglastmonth, $rankinglastweek, $rankinggeral);
-
-        $individualranking = block_ranking_print_individual_ranking();
-
-        $this->content->text = $rankingstables . $individualranking;
+        $this->content->text = $renderer->render($renderable);
 
         $this->content->footer = html_writer::tag('p',
-                                        html_writer::link(
-                                            new moodle_url(
-                                                '/blocks/ranking/report.php',
-                                                array('courseid' => $this->page->course->id)
-                                            ),
-                                            get_string('see_full_ranking', 'block_ranking'),
-                                            array('class' => 'btn btn-default')
-                                        )
-                                  );
+                                html_writer::link(
+                                    new moodle_url(
+                                        '/blocks/ranking/report.php',
+                                        array('courseid' => $this->page->course->id)
+                                    ),
+                                    get_string('see_full_ranking', 'block_ranking'),
+                                    array('class' => 'btn btn-default')
+                                )
+                          );
 
-        $context = context_course::instance($this->page->course->id);
-        if (has_capability('moodle/site:accessallgroups', $context)) {
+        if (has_capability('moodle/site:accessallgroups', $context = $this->page->context)) {
             $this->content->footer .= html_writer::tag('p',
                                           html_writer::link(
                                               new moodle_url(

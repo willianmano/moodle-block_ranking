@@ -2,6 +2,10 @@
     border: 2px solid #ffba00;
 }
 
+.block_ranking .individualTable tr td {
+    text-align: center;
+}
+
 .block_ranking #ranking-tabs ul {
     border: solid #15629f;
     border-width: 0 0 5px;
