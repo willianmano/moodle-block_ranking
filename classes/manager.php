@@ -126,7 +126,7 @@ class block_ranking_manager {
      */
     protected static function add_default_points($completion, $points = null, $grade = null) {
 
-        if (!isset($points) || trim($points) != '') {
+        if ((!isset($points)) || trim($points) == '') {
             $points = self::DEFAULT_POINTS;
         }
 
