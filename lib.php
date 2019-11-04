@@ -119,7 +119,7 @@ function block_ranking_get_students_by_date($limit = 0, $datestart, $dateend) {
             AND c.instanceid = :courseid
             AND r.courseid = :crsid
             AND rl.timecreated BETWEEN :weekstart AND :weekend
-            GROUP BY u.id
+            GROUP BY " . $userfields . "
             ORDER BY points DESC, u.firstname ASC";
 
     $params['contextid'] = $context->id;
