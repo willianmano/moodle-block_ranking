@@ -65,15 +65,15 @@ function block_ranking_get_students($limit = null) {
             AND a.roleid = :roleid
             AND c.instanceid = :courseid
             AND r.courseid = :crsid
-            ORDER BY r.points DESC, u.firstname ASC
-            LIMIT " . $limit;
+            ORDER BY r.points DESC, u.firstname ASC";
+    
     $params['contextid'] = $context->id;
     $params['roleid'] = 5;
     $params['courseid'] = $COURSE->id;
     $params['crsid'] = $COURSE->id;
     $params['r_courseid'] = $COURSE->id;
 
-    $users = array_values($DB->get_records_sql($sql, $params));
+    $users = array_values($DB->get_records_sql($sql, $params, 0, $limit));
 
     return $users;
 }
@@ -120,8 +120,7 @@ function block_ranking_get_students_by_date($limit = 0, $datestart, $dateend) {
             AND r.courseid = :crsid
             AND rl.timecreated BETWEEN :weekstart AND :weekend
             GROUP BY u.id
-            ORDER BY points DESC, u.firstname ASC
-            LIMIT " . $limit;
+            ORDER BY points DESC, u.firstname ASC";
 
     $params['contextid'] = $context->id;
     $params['roleid'] = 5;
@@ -131,7 +130,7 @@ function block_ranking_get_students_by_date($limit = 0, $datestart, $dateend) {
     $params['weekstart'] = $datestart;
     $params['weekend'] = $dateend;
 
-    $users = array_values($DB->get_records_sql($sql, $params));
+    $users = array_values($DB->get_records_sql($sql, $params, 0, $limit));
 
     return $users;
 }
