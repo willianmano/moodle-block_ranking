@@ -1,0 +1,18 @@
+<table class="table table-striped">
+    <thead>
+        <tr>
+            <th scope="col">{{#str}}table_position, block_ranking{{/str}}</th>
+            <th scope="col">{{#str}}table_name, block_ranking{{/str}}</th>
+            <th scope="col">{{#str}}table_points, block_ranking{{/str}}</th>
+        </tr>
+    </thead>
+    <tbody>
+        {{#monthlyranking}}
+            <tr class="{{{class}}}">
+                <th scope="row">{{{position}}}</th>
+                <td>{{{userpic}}} {{firstname}}</td>
+                <td>{{points}}</td>
+            </tr>
+        {{/monthlyranking}}
+    </tbody>
+</table>

@@ -24,82 +24,57 @@
  */
 
 require(__DIR__ . '/../../config.php');
-require_once($CFG->libdir.'/tablelib.php');
-require_once($CFG->dirroot.'/blocks/ranking/lib.php');
 
 define('DEFAULT_PAGE_SIZE', 100);
 
 $courseid = required_param('courseid', PARAM_INT);
 $perpage = optional_param('perpage', DEFAULT_PAGE_SIZE, PARAM_INT); // How many per page.
 $group = optional_param('group', null, PARAM_INT);
-$action = optional_param('action', null, PARAM_ALPHA);
 
 $course = $DB->get_record('course', array('id' => $courseid), '*', MUST_EXIST);
 
 require_login($courseid);
 $context = context_course::instance($courseid);
 
-// Some stuff.
-$url = new moodle_url('/blocks/ranking/report.php', array('courseid' => $courseid));
-if ($action) {
-    $url->param('action', $action);
+$params = ['courseid' => $courseid];
+
+if ($perpage) {
+    $params['perpage'] = $perpage;
 }
-
-// Page info.
-$PAGE->set_context($context);
-$PAGE->set_pagelayout('course');
-$PAGE->set_title($course->fullname.': Ranking geral dos alunos');
-$PAGE->set_heading($COURSE->fullname);
-$PAGE->set_url($url);
-
-$userfields = user_picture::fields('u', array('username'));
-$from = "FROM {user} u
-        INNER JOIN {role_assignments} a ON a.userid = u.id
-        LEFT JOIN {ranking_points} r ON r.userid = u.id AND r.courseid = :r_courseid
-        INNER JOIN {context} c ON c.id = a.contextid";
-
-$where = "WHERE a.contextid = :contextid
-        AND a.userid = u.id
-        AND a.roleid = :roleid
-        AND c.instanceid = :courseid";
-
-$params['contextid'] = $context->id;
-$params['roleid'] = 5;
-$params['courseid'] = $COURSE->id;
-$params['r_courseid'] = $params['courseid'];
-
-$order = "ORDER BY r.points DESC, u.firstname ASC";
 
 if ($group) {
-    $from .= " INNER JOIN {groups_members} gm ON gm.userid = u.id AND gm.groupid = :groupid";
-    $params['groupid'] = $group;
+    $params['group'] = $group;
 }
 
-$sql = "SELECT $userfields, r.points $from $where $order";
+$url = new moodle_url('/blocks/ranking/report.php', $params);
 
-$students = array_values($DB->get_records_sql($sql, $params, 0, $perpage));
+// Page info.
+$PAGE->set_url($url);
+$PAGE->set_context($context);
+$PAGE->set_pagelayout('incourse');
 
-$strcoursereport = get_string('nostudents', 'block_ranking');;
-if (count($students)) {
-    $strcoursereport = get_string('report_head', 'block_ranking', count($students));
-}
+$title = get_string('report_title', 'block_ranking', $course->fullname);
+$PAGE->set_title($title);
+$PAGE->set_heading($title);
 
-echo $OUTPUT->header();
-echo $OUTPUT->heading($strcoursereport);
-$PAGE->set_title($strcoursereport);
+$PAGE->navbar->add(get_string('pluginname', 'block_ranking'));
 
-// Output group selector if there are groups in the course.
-echo $OUTPUT->container_start('ranking-report');
+$output = $PAGE->get_renderer('block_ranking');
 
-if (has_capability('moodle/site:accessallgroups', $context)) {
+echo $output->header();
+echo $output->container_start('ranking-report');
+
+if (has_capability('moodle/course:managegroups', $context)) {
     $groups = groups_get_all_groups($course->id);
     if (!empty($groups)) {
         groups_print_course_menu($course, $PAGE->url);
     }
 }
 
-echo generate_table($students);
+$renderable = new \block_ranking\output\report($perpage, $group);
 
-echo $OUTPUT->container_end();
+echo $output->render($renderable);
 
-echo $OUTPUT->footer();
+echo $output->container_end();
+
+echo $output->footer();

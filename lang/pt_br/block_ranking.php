@@ -42,10 +42,10 @@ $string['graph_groups'] = 'Gráfico de pontos por grupo';
 $string['graph_group_evolution'] = 'Gráficos da evolução dos pontos do grupo';
 $string['graph_group_evolution_title'] = 'Gráficos da evolução dos pontos do grupo na última semana';
 $string['graph_groups_avg'] = 'Gráficos de média de pontos por grupo';
-
 $stirng['graph_access_deny'] = 'Você não tem permissão de visualizar os grupos do curso para ver este relatório.';
 $stirng['graph_no_groups'] = 'Este curso não possui grupos para poder visualizar os relatórios.';
 
+$string['report_title'] = '{$a} : Ranking geral dos estudantes';
 $string['report_head'] = 'Detalhes do ranking: Primeiros {$a} estudantes';
 
 // Global configuration.

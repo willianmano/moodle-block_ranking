@@ -38,6 +38,8 @@ class block_ranking extends block_base {
      * Sets the block title
      *
      * @return void
+     *
+     * @throws coding_exception
      */
     public function init() {
         $this->title = get_string('ranking', 'block_ranking');
@@ -72,61 +74,34 @@ class block_ranking extends block_base {
     /**
      * Creates the blocks main content
      *
-     * @return string
+     * @return stdClass|stdObject
+     *
+     * @throws coding_exception
+     * @throws dml_exception
      */
     public function get_content() {
         $this->content = new stdClass;
         $this->content->text = '';
         $this->content->footer = '';
 
-        $rankingsize = isset($this->config->ranking_rankingsize) ? trim($this->config->ranking_rankingsize) : 0;
+        $rankingsize = isset($this->config->ranking_rankingsize) ? trim($this->config->ranking_rankingsize) : null;
+        if (!$rankingsize) {
+            $rankingsize = 10;
 
-        $weekstart = strtotime(date('d-m-Y', strtotime('-'.date('w').' days')));
-        $rankinglastweek = block_ranking_get_students_by_date($rankingsize, $weekstart, time());
+            $cfgranking = get_config('block_ranking');
 
-        $monthstart = strtotime(date('Y-m-01'));
-        $rankinglastmonth = block_ranking_get_students_by_date($rankingsize, $monthstart, time());
-
-        $rankinggeral = block_ranking_get_students($rankingsize);
-
-        $rankingstables = block_ranking_print_students($rankinglastmonth, $rankinglastweek, $rankinggeral);
-
-        $individualranking = block_ranking_print_individual_ranking();
-
-        $this->content->text = $rankingstables . $individualranking;
-
-        $this->content->footer = html_writer::tag('p',
-                                        html_writer::link(
-                                            new moodle_url(
-                                                '/blocks/ranking/report.php',
-                                                array('courseid' => $this->page->course->id)
-                                            ),
-                                            get_string('see_full_ranking', 'block_ranking'),
-                                            array('class' => 'btn btn-default')
-                                        )
-                                  );
-
-        $context = context_course::instance($this->page->course->id);
-        if (has_capability('moodle/site:accessallgroups', $context)) {
-            $this->content->footer .= html_writer::tag('p',
-                                          html_writer::link(
-                                              new moodle_url(
-                                                  '/blocks/ranking/graphs.php',
-                                                  array('courseid' => $this->page->course->id)
-                                              ),
-                                              get_string('ranking_graphs', 'block_ranking'),
-                                              array('class' => 'btn btn-default')
-                                          )
-                                    );
+            if (isset($cfgranking->rankingsize) && trim($cfgranking->rankingsize) != '') {
+                $rankingsize = $cfgranking->rankingsize;
+            }
         }
 
-        $this->content->footer .= "
-            <script type='text/javascript'>
-                Y.use('tabview', function(Y) {
-                    var tabview = new Y.TabView({srcNode: '#ranking-tabs'});
-                    tabview.render();
-                });
-            </script>";
+        $renderer = $this->page->get_renderer('block_ranking');
+
+        $contentrenderable = new \block_ranking\output\block($rankingsize);
+        $this->content->text = $renderer->render($contentrenderable);
+
+        $footerrenderable = new \block_ranking\output\block_footer($this->page->course->id);
+        $this->content->footer = $renderer->render($footerrenderable);
 
         return $this->content;
     }

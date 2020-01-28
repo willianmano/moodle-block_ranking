@@ -1,0 +1,42 @@
+<ul class="nav nav-tabs" id="ranking-tab" role="tablist">
+    <li class="nav-item">
+        <a class="nav-link active" id="general-tab" data-toggle="tab" href="#general" role="tab" aria-controls="general" aria-selected="true">{{#str}}general, block_ranking{{/str}}</a>
+    </li>
+    <li class="nav-item">
+        <a class="nav-link" id="weekly-tab" data-toggle="tab" href="#weekly" role="tab" aria-controls="weekly" aria-selected="false">{{#str}}weekly, block_ranking{{/str}}</a>
+    </li>
+    <li class="nav-item">
+        <a class="nav-link" id="monthly-tab" data-toggle="tab" href="#monthly" role="tab" aria-controls="monthly" aria-selected="false">{{#str}}monthly, block_ranking{{/str}}</a>
+    </li>
+</ul>
+<div class="tab-content" id="ranking-tab-content">
+    <div class="tab-pane fade show active" id="general" role="tabpanel" aria-labelledby="general-tab">
+        {{> block_ranking/generalranking }}
+    </div>
+    <div class="tab-pane fade" id="weekly" role="tabpanel" aria-labelledby="weekly-tab">
+        {{> block_ranking/weeklyranking }}
+    </div>
+    <div class="tab-pane fade" id="monthly" role="tabpanel" aria-labelledby="monthly-tab">
+        {{> block_ranking/monthlyranking }}
+    </div>
+</div>
+
+{{#studentdata}}
+    <h6>{{#str}}your_score, block_ranking{{/str}}</h6>
+    <table class="table">
+        <thead class="thead-dark">
+        <tr>
+            <th>{{#str}}general, block_ranking{{/str}}</th>
+            <th>{{#str}}weekly, block_ranking{{/str}}</th>
+            <th>{{#str}}monthly, block_ranking{{/str}}</th>
+        </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <th>{{{studentdata.generalpoints}}}</th>
+                <td>{{{studentdata.weeklypoints}}}</td>
+                <td>{{{studentdata.monthlypoints}}}</td>
+            </tr>
+        </tbody>
+    </table>
+{{/studentdata}}
