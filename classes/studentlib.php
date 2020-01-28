@@ -36,8 +36,6 @@ class studentlib {
     /**
      * Returns the total user's points in a course
      *
-     * @param int $courseid
-     *
      * @return mixed
      *
      * @throws \dml_exception
@@ -72,7 +70,6 @@ class studentlib {
      *
      * @param int $datestart
      * @param int $dateend
-     * @param int $courseid
      *
      * @return mixed
      *

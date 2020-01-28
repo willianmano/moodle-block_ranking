@@ -24,8 +24,6 @@
 
 defined('MOODLE_INTERNAL') || die();
 
-require_once($CFG->dirroot.'/blocks/ranking/lib.php');
-
 /**
  * Ranking block definition class
  *
