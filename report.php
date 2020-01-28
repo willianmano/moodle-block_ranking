@@ -68,8 +68,7 @@ $params['roleid'] = 5;
 $params['courseid'] = $COURSE->id;
 $params['r_courseid'] = $params['courseid'];
 
-$order = "ORDER BY r.points DESC, u.firstname ASC
-        LIMIT " . $perpage;
+$order = "ORDER BY r.points DESC, u.firstname ASC";
 
 if ($group) {
     $from .= " INNER JOIN {groups_members} gm ON gm.userid = u.id AND gm.groupid = :groupid";
@@ -78,7 +77,7 @@ if ($group) {
 
 $sql = "SELECT $userfields, r.points $from $where $order";
 
-$students = array_values($DB->get_records_sql($sql, $params));
+$students = array_values($DB->get_records_sql($sql, $params, 0, $perpage));
 
 $strcoursereport = get_string('nostudents', 'block_ranking');;
 if (count($students)) {
