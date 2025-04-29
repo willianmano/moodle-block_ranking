@@ -43,8 +43,8 @@ $string['graph_groups'] = 'Graph of groups points';
 $string['graph_group_evolution'] = 'Graph of group points evolution';
 $string['graph_group_evolution_title'] = 'Graph of group points evolution in last week';
 $string['graph_groups_avg'] = 'Graph of groups points average';
-$stirng['graph_access_deny'] = 'You don\'t have access to view the course groups to view that report.';
-$stirng['graph_no_groups'] = 'There is no group in this course to view this report.';
+$string['graph_access_deny'] = 'You don\'t have access to view the course groups to view that report.';
+$string['graph_no_groups'] = 'There is no group in this course to view this report.';
 
 $string['report_title'] = '{$a} : General students ranking';
 $string['report_head'] = 'Ranking details: First {$a} students';
